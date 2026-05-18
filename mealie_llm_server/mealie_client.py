@@ -44,9 +44,9 @@ class MealieClient:
 
     async def _refresh(self) -> None:
         try:
-            foods_resp = await self._client.get(f"{self._base_url}/api/foods", params={"per_page": "-1"})
+            foods_resp = await self._client.get(f"{self._base_url}/api/foods", params={"perPage": "-1"})
             foods_resp.raise_for_status()
-            units_resp = await self._client.get(f"{self._base_url}/api/units", params={"per_page": "-1"})
+            units_resp = await self._client.get(f"{self._base_url}/api/units", params={"perPage": "-1"})
             units_resp.raise_for_status()
         except (httpx.HTTPStatusError, httpx.RequestError) as e:
             if self._foods is not None:

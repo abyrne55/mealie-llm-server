@@ -59,6 +59,13 @@ def build_ingredient_schema(foods: list[str], units: list[str]) -> dict[str, Any
     }
 
 
+def _is_known_unit(value: str, unit_aliases: dict[str, list[str]]) -> bool:
+    for aliases in unit_aliases.values():
+        if value in aliases:
+            return True
+    return False
+
+
 def null_unit_heuristic(
     original_text: str,
     unit: str | None,
@@ -71,7 +78,7 @@ def null_unit_heuristic(
     if unit == food:
         return {"unit": None, "food": food}
 
-    if food is None and unit is not None:
+    if food is None and not _is_known_unit(unit, unit_aliases):
         return {"unit": None, "food": unit}
 
     text_lower = original_text.lower()

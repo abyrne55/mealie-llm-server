@@ -57,10 +57,10 @@ class TestFetchFoods:
     @respx.mock
     @pytest.mark.asyncio
     async def test_fetch_foods_extracts_all_name_variants(self, client):
-        respx.get("http://mealie.test:9000/api/foods", params={"per_page": "-1"}).mock(
+        respx.get("http://mealie.test:9000/api/foods", params={"perPage": "-1"}).mock(
             return_value=httpx.Response(200, json=FOODS_RESPONSE)
         )
-        respx.get("http://mealie.test:9000/api/units", params={"per_page": "-1"}).mock(
+        respx.get("http://mealie.test:9000/api/units", params={"perPage": "-1"}).mock(
             return_value=httpx.Response(200, json=UNITS_RESPONSE)
         )
         foods = await client.get_foods()
@@ -77,10 +77,10 @@ class TestFetchUnits:
     @respx.mock
     @pytest.mark.asyncio
     async def test_fetch_units_extracts_abbreviations(self, client):
-        respx.get("http://mealie.test:9000/api/foods", params={"per_page": "-1"}).mock(
+        respx.get("http://mealie.test:9000/api/foods", params={"perPage": "-1"}).mock(
             return_value=httpx.Response(200, json=FOODS_RESPONSE)
         )
-        respx.get("http://mealie.test:9000/api/units", params={"per_page": "-1"}).mock(
+        respx.get("http://mealie.test:9000/api/units", params={"perPage": "-1"}).mock(
             return_value=httpx.Response(200, json=UNITS_RESPONSE)
         )
         units = await client.get_units()
@@ -100,10 +100,10 @@ class TestCache:
     @respx.mock
     @pytest.mark.asyncio
     async def test_cache_returns_same_data_within_ttl(self, client):
-        foods_route = respx.get("http://mealie.test:9000/api/foods", params={"per_page": "-1"}).mock(
+        foods_route = respx.get("http://mealie.test:9000/api/foods", params={"perPage": "-1"}).mock(
             return_value=httpx.Response(200, json=FOODS_RESPONSE)
         )
-        respx.get("http://mealie.test:9000/api/units", params={"per_page": "-1"}).mock(
+        respx.get("http://mealie.test:9000/api/units", params={"perPage": "-1"}).mock(
             return_value=httpx.Response(200, json=UNITS_RESPONSE)
         )
         await client.get_foods()
@@ -113,10 +113,10 @@ class TestCache:
     @respx.mock
     @pytest.mark.asyncio
     async def test_cache_refreshes_after_ttl(self, client):
-        foods_route = respx.get("http://mealie.test:9000/api/foods", params={"per_page": "-1"}).mock(
+        foods_route = respx.get("http://mealie.test:9000/api/foods", params={"perPage": "-1"}).mock(
             return_value=httpx.Response(200, json=FOODS_RESPONSE)
         )
-        respx.get("http://mealie.test:9000/api/units", params={"per_page": "-1"}).mock(
+        respx.get("http://mealie.test:9000/api/units", params={"perPage": "-1"}).mock(
             return_value=httpx.Response(200, json=UNITS_RESPONSE)
         )
         await client.get_foods()
@@ -129,8 +129,8 @@ class TestStaleOnError:
     @respx.mock
     @pytest.mark.asyncio
     async def test_stale_on_error(self, client):
-        foods_route = respx.get("http://mealie.test:9000/api/foods", params={"per_page": "-1"})
-        units_route = respx.get("http://mealie.test:9000/api/units", params={"per_page": "-1"})
+        foods_route = respx.get("http://mealie.test:9000/api/foods", params={"perPage": "-1"})
+        units_route = respx.get("http://mealie.test:9000/api/units", params={"perPage": "-1"})
 
         foods_route.mock(return_value=httpx.Response(200, json=FOODS_RESPONSE))
         units_route.mock(return_value=httpx.Response(200, json=UNITS_RESPONSE))
@@ -146,10 +146,10 @@ class TestStaleOnError:
     @respx.mock
     @pytest.mark.asyncio
     async def test_graceful_degradation_on_first_fetch_failure(self, client):
-        respx.get("http://mealie.test:9000/api/foods", params={"per_page": "-1"}).mock(
+        respx.get("http://mealie.test:9000/api/foods", params={"perPage": "-1"}).mock(
             return_value=httpx.Response(500)
         )
-        respx.get("http://mealie.test:9000/api/units", params={"per_page": "-1"}).mock(
+        respx.get("http://mealie.test:9000/api/units", params={"perPage": "-1"}).mock(
             return_value=httpx.Response(500)
         )
         foods = await client.get_foods()
@@ -162,10 +162,10 @@ class TestUnitAliases:
     @respx.mock
     @pytest.mark.asyncio
     async def test_unit_alias_lookup(self, client):
-        respx.get("http://mealie.test:9000/api/foods", params={"per_page": "-1"}).mock(
+        respx.get("http://mealie.test:9000/api/foods", params={"perPage": "-1"}).mock(
             return_value=httpx.Response(200, json=FOODS_RESPONSE)
         )
-        respx.get("http://mealie.test:9000/api/units", params={"per_page": "-1"}).mock(
+        respx.get("http://mealie.test:9000/api/units", params={"perPage": "-1"}).mock(
             return_value=httpx.Response(200, json=UNITS_RESPONSE)
         )
         aliases = await client.get_unit_aliases()
