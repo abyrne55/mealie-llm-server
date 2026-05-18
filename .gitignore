@@ -219,3 +219,7 @@ __marimo__/
 
 # Worktrees
 .worktrees/
+
+# Local
+.tmp/
+docs/superpowers/
