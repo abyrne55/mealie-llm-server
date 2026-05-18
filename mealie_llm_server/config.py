@@ -35,7 +35,7 @@ class Settings(BaseSettings):
     UPSTREAM_API_KEY: str | None = None
     UPSTREAM_TIMEOUT: int = 300
 
-    MODEL_INGREDIENT_PARSING: str = "numind/NuExtract-2.0-2B-GGUF:Q6_K"
+    MODEL_INGREDIENT_PARSING: str = "openbmb/MiniCPM-V-4.6-gguf:Q6_K"
     MODEL_GENERAL: str | None = None
     MODEL_LOADING_STRATEGY: str = "all"
     MODEL_CONTEXT_SIZE: int = 4096

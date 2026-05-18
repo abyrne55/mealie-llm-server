@@ -3,7 +3,7 @@ import pytest
 from unittest.mock import AsyncMock, MagicMock, patch
 from mealie_llm_server.handlers.ingredient_parsing import (
     extract_ingredients,
-    build_nuextract_messages,
+    build_messages,
     null_unit_heuristic,
     resolve_unit,
     normalize_quantity,
@@ -23,18 +23,23 @@ class TestExtractIngredients:
         assert result == ["1 tbsp olive oil"]
 
 
-class TestBuildNuextractMessages:
-    def test_message_format(self):
-        messages = build_nuextract_messages("1 cup flour")
+class TestBuildMessages:
+    def test_nuextract_format(self):
+        messages = build_messages("1 cup flour", "numind/NuExtract-2.0-2B-GGUF:Q6_K")
         assert len(messages) == 1
         content = messages[0]["content"]
         assert "# Template:" in content
         assert '"quantity": "number"' in content
-        assert '"unit": "string"' in content
-        assert '"food": "string"' in content
-        assert '"note": "verbatim-string"' in content
         assert "# Context:" in content
         assert "1 cup flour" in content
+
+    def test_chat_format(self):
+        messages = build_messages("1 cup flour", "openbmb/MiniCPM-V-4.6-gguf:Q6_K")
+        assert len(messages) == 1
+        content = messages[0]["content"]
+        assert "Extract quantity" in content
+        assert "1 cup flour" in content
+        assert "Example:" in content
 
 
 class TestNullUnitHeuristic:

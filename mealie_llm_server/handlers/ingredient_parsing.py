@@ -26,6 +26,16 @@ _NUEXTRACT_TEMPLATE = """\
     "note": "verbatim-string"
 }"""
 
+_CHAT_FEWSHOT_PROMPT = """\
+Extract quantity, unit, food, note from this ingredient as JSON. \
+Convert fractions to decimals (1/2 = 0.5, 1/4 = 0.25, 1 1/2 = 1.5).
+
+Example: 1/2 cup milk -> {"quantity": 0.5, "unit": "cup", "food": "milk", "note": null}
+Example: 2 cloves garlic, minced -> {"quantity": 2, "unit": "cloves", "food": "garlic", "note": "minced"}
+Example: salt to taste -> {"quantity": null, "unit": null, "food": "salt", "note": "to taste"}
+
+Ingredient: %s"""
+
 _STRUCTURE_SCHEMA: dict[str, Any] = {
     "type": "object",
     "properties": {
@@ -43,8 +53,11 @@ def extract_ingredients(content: str) -> list[str]:
     return json.loads(content)
 
 
-def build_nuextract_messages(ingredient_text: str) -> list[dict[str, str]]:
-    prompt = f"# Template:\n{_NUEXTRACT_TEMPLATE}\n\n# Context:\n{ingredient_text}"
+def build_messages(ingredient_text: str, model_id: str) -> list[dict[str, str]]:
+    if "nuextract" in model_id.lower():
+        prompt = f"# Template:\n{_NUEXTRACT_TEMPLATE}\n\n# Context:\n{ingredient_text}"
+    else:
+        prompt = _CHAT_FEWSHOT_PROMPT % ingredient_text
     return [{"role": "user", "content": prompt}]
 
 
@@ -108,13 +121,14 @@ def normalize_quantity(value: Any) -> float | None:
 class IngredientParsingHandler(Handler):
     model_key = "ingredient_parsing"
 
-    def __init__(self, food_matcher: FoodMatcher | None = None):
+    def __init__(self, food_matcher: FoodMatcher | None = None, model_id: str = ""):
         self.reference_prompt = (
             files("mealie_llm_server.prompts")
             .joinpath("parse-recipe-ingredients.txt")
             .read_text()
         )
         self._food_matcher = food_matcher
+        self._model_id = model_id
 
     async def handle(
         self,
@@ -126,14 +140,13 @@ class IngredientParsingHandler(Handler):
         ingredients = extract_ingredients(user_msg.content)
 
         foods = await mealie_client.get_foods()
-        units = await mealie_client.get_units()
         unit_aliases = await mealie_client.get_unit_aliases()
 
         grammar = LlamaGrammar.from_json_schema(json.dumps(_STRUCTURE_SCHEMA))
 
         results = []
         for ingredient_text in ingredients:
-            messages = build_nuextract_messages(ingredient_text)
+            messages = build_messages(ingredient_text, self._model_id)
             response = model.create_chat_completion(
                 messages=messages,
                 grammar=grammar,
@@ -154,4 +167,4 @@ class IngredientParsingHandler(Handler):
             results.append(raw)
 
         output = json.dumps({"ingredients": results})
-        return build_chat_completion_response(content=output, model="nuextract-2.0-2b")
+        return build_chat_completion_response(content=output, model=self._model_id or "ingredient-parser")

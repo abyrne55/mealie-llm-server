@@ -54,7 +54,10 @@ async def lifespan(app: FastAPI):
     )
 
     food_matcher = FoodMatcher()
-    ingredient_handler = IngredientParsingHandler(food_matcher=food_matcher)
+    ingredient_handler = IngredientParsingHandler(
+        food_matcher=food_matcher,
+        model_id=settings.MODEL_INGREDIENT_PARSING,
+    )
     _HANDLER_REGISTRY["parse-recipe-ingredients"] = ingredient_handler
 
     app.state.settings = settings

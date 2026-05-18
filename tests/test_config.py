@@ -11,7 +11,7 @@ class TestSettings:
     def test_defaults(self):
         settings = Settings(MEALIE_URL="http://localhost", MEALIE_API_KEY="key")
         assert settings.MEALIE_CACHE_TTL == 300
-        assert settings.MODEL_INGREDIENT_PARSING == "numind/NuExtract-2.0-2B-GGUF:Q6_K"
+        assert settings.MODEL_INGREDIENT_PARSING == "openbmb/MiniCPM-V-4.6-gguf:Q6_K"
         assert settings.MODEL_LOADING_STRATEGY == "all"
         assert settings.MODEL_CONTEXT_SIZE == 4096
         assert settings.MODEL_CACHE_DIR == "/models"
@@ -50,7 +50,7 @@ class TestSettings:
     def test_parse_model_id(self):
         settings = Settings(MEALIE_URL="http://localhost", MEALIE_API_KEY="key")
         repo_id, filename = settings.parse_model_id(settings.MODEL_INGREDIENT_PARSING)
-        assert repo_id == "numind/NuExtract-2.0-2B-GGUF"
+        assert repo_id == "openbmb/MiniCPM-V-4.6-gguf"
         assert filename == "*Q6_K.gguf"
 
     def test_parse_model_id_missing_colon(self):
