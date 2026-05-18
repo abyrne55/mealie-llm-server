@@ -70,6 +70,22 @@ uv run pytest -v
 uv run uvicorn mealie_llm_server.app:app --reload
 ```
 
+### Testing with a Live Mealie Instance
+
+To spin up an ephemeral, pre-seeded Mealie container for local testing:
+
+```bash
+./scripts/start-mealie.sh
+```
+
+This starts a Mealie container on port 9797, seeds it with foods/units/labels, creates an API token, and writes `.env.test`. Re-runs are idempotent.
+
+Clean up when done:
+
+```bash
+podman stop mealie-test && podman rm mealie-test
+```
+
 ## License
 
 MIT

@@ -11,6 +11,17 @@ uv run pytest -v                                   # run tests
 uv run ruff check .                                # lint
 ```
 
+## Testing with a Live Mealie Instance
+
+```bash
+./scripts/start-mealie.sh   # start ephemeral Mealie container, seed data, print env
+source <(grep '^export' <(./scripts/start-mealie.sh))  # or source the exports directly
+```
+
+Launches a pre-seeded Mealie container (`mealie-test`) on port 9797 with foods, units, labels, and a long-lived API token. Writes `.env.test` with `MEALIE_URL` and `MEALIE_API_KEY`. Idempotent — re-runs exit early if credentials are still valid.
+
+Cleanup: `podman stop mealie-test && podman rm mealie-test`
+
 ## Container Build
 
 ```bash
