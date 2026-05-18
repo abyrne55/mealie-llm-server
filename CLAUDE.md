@@ -51,9 +51,11 @@ All env vars support `_FILE` variants for container secrets (e.g. `MEALIE_API_KE
 | `MEALIE_CACHE_TTL` | No | `300` | Cache TTL in seconds |
 | `UPSTREAM_URL` | No | — | Upstream OpenAI-compatible API URL |
 | `UPSTREAM_API_KEY` | No | — | Upstream API key |
+| `UPSTREAM_TIMEOUT` | No | `300` | Upstream request timeout (seconds) |
 | `MODEL_INGREDIENT_PARSING` | No | `numind/NuExtract-2.0-2B-GGUF:Q6_K` | HF model ID |
 | `MODEL_LOADING_STRATEGY` | No | `all` | `all` or `swap` |
 | `MODEL_CONTEXT_SIZE` | No | `4096` | Context window size |
+| `MODEL_THREADS` | No | auto | CPU threads for inference |
 | `MODEL_CACHE_DIR` | No | `/models` | Model download directory |
 | `ROUTER_THRESHOLD` | No | `0.6` | Jaccard similarity threshold |
 | `LOG_LEVEL` | No | `info` | Logging level |
