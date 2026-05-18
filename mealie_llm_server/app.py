@@ -4,7 +4,6 @@ import logging
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, Request
-from fastapi.responses import JSONResponse
 
 from mealie_llm_server.config import Settings
 from mealie_llm_server.handlers.base import Handler

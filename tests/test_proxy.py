@@ -23,7 +23,7 @@ class TestForwardChatCompletion:
         upstream_route = respx.post("http://upstream.test/v1/chat/completions").mock(
             return_value=httpx.Response(200, json={"choices": [{"message": {"content": "hello"}}]})
         )
-        resp = await proxy.forward_chat_completion(body, "application/json", stream=False)
+        await proxy.forward_chat_completion(body, "application/json", stream=False)
         assert upstream_route.called
         sent_body = json.loads(upstream_route.calls[0].request.content)
         assert sent_body["model"] == "gpt-4o"

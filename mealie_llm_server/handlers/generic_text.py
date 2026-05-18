@@ -1,7 +1,7 @@
 from importlib.resources import files
 
 from mealie_llm_server.handlers.base import Handler
-from mealie_llm_server.models import ChatCompletionRequest, ChatCompletionResponse
+from mealie_llm_server.models import ChatCompletionResponse
 
 
 class GenericTextHandler(Handler):
