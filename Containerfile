@@ -11,10 +11,9 @@ RUN dnf install -y --setopt=install_weak_deps=False \
     gcc \
     gcc-c++ \
     make \
-    cmake \
     python3-devel \
-    uv \
-    && dnf clean all
+    && dnf clean all \
+    && pip install --root-user-action=ignore uv cmake
 
 WORKDIR /build
 
@@ -43,6 +42,11 @@ WORKDIR /app
 COPY --from=builder --chown=65532:0 /build/.venv /app/.venv
 COPY --from=builder --chown=65532:0 /build/mealie_llm_server /app/mealie_llm_server
 
+# libstdc++: needed by llama-cpp-python's bundled libllama.so
+COPY --from=builder /usr/lib64/libstdc++.so.6* /usr/lib64/
+# libgomp: needed by llama-cpp-python for OpenMP parallel inference
+COPY --from=builder /usr/lib64/libgomp.so* /usr/lib64/
+
 ENV PATH="/app/.venv/bin:$PATH"
 
 VOLUME ["/models"]
@@ -52,4 +56,4 @@ EXPOSE 8000
 HEALTHCHECK --interval=30s --timeout=5s --retries=3 --start-period=120s \
     CMD ["python3", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
 
-ENTRYPOINT ["uvicorn", "mealie_llm_server.app:app", "--host", "0.0.0.0", "--port", "8000"]
+ENTRYPOINT ["python3", "-m", "uvicorn", "mealie_llm_server.app:app", "--host", "0.0.0.0", "--port", "8000"]
