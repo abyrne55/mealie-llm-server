@@ -68,7 +68,7 @@ class MealieClient:
         names: list[str] = []
         seen: set[str] = set()
         for item in items:
-            for key in ("name", "plural_name"):
+            for key in ("name", "pluralName"):
                 val = item.get(key)
                 if val and val not in seen:
                     names.append(val)
@@ -90,7 +90,7 @@ class MealieClient:
             canonical = item.get("name", "")
             all_aliases: list[str] = []
 
-            for key in ("name", "plural_name", "abbreviation", "plural_abbreviation"):
+            for key in ("name", "pluralName", "abbreviation", "pluralAbbreviation"):
                 val = item.get(key)
                 if val and val not in seen:
                     names.append(val)

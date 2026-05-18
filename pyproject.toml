@@ -12,6 +12,7 @@ dependencies = [
     "httpx>=0.28",
     "pydantic>=2.11",
     "pydantic-settings>=2.9",
+    "model2vec>=0.6",
 ]
 
 [dependency-groups]

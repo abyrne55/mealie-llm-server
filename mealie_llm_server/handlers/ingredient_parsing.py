@@ -6,14 +6,14 @@ from fractions import Fraction
 from importlib.resources import files
 from typing import TYPE_CHECKING, Any
 
-import numpy as np
-from llama_cpp import LlamaGrammar, LogitsProcessorList
+from llama_cpp import LlamaGrammar
 
 from mealie_llm_server.handlers.base import Handler
 from mealie_llm_server.models import ChatCompletionRequest, ChatCompletionResponse, build_chat_completion_response
 
 if TYPE_CHECKING:
     from llama_cpp import Llama
+    from mealie_llm_server.food_matcher import FoodMatcher
     from mealie_llm_server.mealie_client import MealieClient
 
 logger = logging.getLogger(__name__)
@@ -26,6 +26,18 @@ _NUEXTRACT_TEMPLATE = """\
     "note": "verbatim-string"
 }"""
 
+_STRUCTURE_SCHEMA: dict[str, Any] = {
+    "type": "object",
+    "properties": {
+        "quantity": {"type": ["number", "null"]},
+        "unit": {"type": ["string", "null"]},
+        "food": {"type": "string"},
+        "note": {"type": ["string", "null"]},
+    },
+    "required": ["quantity", "unit", "food", "note"],
+    "additionalProperties": False,
+}
+
 
 def extract_ingredients(content: str) -> list[str]:
     return json.loads(content)
@@ -34,32 +46,6 @@ def extract_ingredients(content: str) -> list[str]:
 def build_nuextract_messages(ingredient_text: str) -> list[dict[str, str]]:
     prompt = f"# Template:\n{_NUEXTRACT_TEMPLATE}\n\n# Context:\n{ingredient_text}"
     return [{"role": "user", "content": prompt}]
-
-
-def build_ingredient_schema(
-    foods: list[str], units: list[str], *, allow_null_food: bool = True,
-) -> dict[str, Any]:
-    if foods:
-        food_prop: dict[str, Any] = {"enum": foods + ([None] if allow_null_food else [])}
-    else:
-        food_prop = {"type": ["string", "null"] if allow_null_food else "string"}
-
-    if units:
-        unit_prop: dict[str, Any] = {"enum": units + [None]}
-    else:
-        unit_prop = {"type": ["string", "null"]}
-
-    return {
-        "type": "object",
-        "properties": {
-            "quantity": {"type": ["number", "null"]},
-            "unit": unit_prop,
-            "food": food_prop,
-            "note": {"type": ["string", "null"]},
-        },
-        "required": ["quantity", "unit", "food", "note"],
-        "additionalProperties": False,
-    }
 
 
 def _is_known_unit(value: str, unit_aliases: dict[str, list[str]]) -> bool:
@@ -84,53 +70,24 @@ def null_unit_heuristic(
     if food is None and not _is_known_unit(unit, unit_aliases):
         return {"unit": None, "food": unit}
 
-    text_lower = original_text.lower()
+    text_words = set(original_text.lower().split())
     aliases = unit_aliases.get(unit, [unit])
     for alias in aliases:
-        if alias.lower() in text_lower:
+        if alias.lower() in text_words:
             return {"unit": unit, "food": food}
 
     return {"unit": None, "food": food}
 
 
-
-_FOOD_LOGPROB_THRESHOLD = -5.0
-
-
-class _LogprobCapture:
-    """Captures per-token logprobs during generation via logits_processor."""
-
-    def __init__(self):
-        self.step_logprobs: list[np.ndarray] = []
-
-    def __call__(self, input_ids, logits):
-        self.step_logprobs.append((logits - np.logaddexp.reduce(logits)).copy())
-        return logits
-
-    def reset(self):
-        self.step_logprobs = []
-
-    def food_confidence(self, model: Llama, output_text: str, food_value: str) -> float:
-        token_ids = model.tokenize(output_text.encode("utf-8"), add_bos=False)
-        for marker in (f'"food": "{food_value}"', f'"food":"{food_value}"'):
-            idx = output_text.find(marker)
-            if idx != -1:
-                val_start = idx + marker.index(food_value)
-                break
-        else:
-            return 0.0
-        val_end = val_start + len(food_value)
-        token_strs = [model.detokenize([tid]).decode("utf-8", errors="replace") for tid in token_ids]
-        pos = 0
-        food_logprobs = []
-        for step, (tid, ts) in enumerate(zip(token_ids, token_strs)):
-            token_end = pos + len(ts)
-            if pos < val_end and token_end > val_start and step < len(self.step_logprobs):
-                food_logprobs.append(float(self.step_logprobs[step][tid]))
-            pos = token_end
-        if not food_logprobs:
-            return 0.0
-        return min(food_logprobs)
+def resolve_unit(extracted: str | None, unit_aliases: dict[str, list[str]]) -> str | None:
+    if not extracted:
+        return None
+    lower = extracted.lower().strip()
+    for canonical, aliases in unit_aliases.items():
+        for alias in aliases:
+            if alias.lower() == lower:
+                return canonical
+    return None
 
 
 def normalize_quantity(value: Any) -> float | None:
@@ -151,12 +108,13 @@ def normalize_quantity(value: Any) -> float | None:
 class IngredientParsingHandler(Handler):
     model_key = "ingredient_parsing"
 
-    def __init__(self):
+    def __init__(self, food_matcher: FoodMatcher | None = None):
         self.reference_prompt = (
             files("mealie_llm_server.prompts")
             .joinpath("parse-recipe-ingredients.txt")
             .read_text()
         )
+        self._food_matcher = food_matcher
 
     async def handle(
         self,
@@ -171,44 +129,27 @@ class IngredientParsingHandler(Handler):
         units = await mealie_client.get_units()
         unit_aliases = await mealie_client.get_unit_aliases()
 
-        schema = build_ingredient_schema(foods, units, allow_null_food=not foods)
-
-        capture = _LogprobCapture() if foods else None
-        logits_processor = LogitsProcessorList([capture]) if capture else None
+        grammar = LlamaGrammar.from_json_schema(json.dumps(_STRUCTURE_SCHEMA))
 
         results = []
         for ingredient_text in ingredients:
-            if capture:
-                capture.reset()
-            grammar = LlamaGrammar.from_json_schema(json.dumps(schema))
             messages = build_nuextract_messages(ingredient_text)
             response = model.create_chat_completion(
                 messages=messages,
                 grammar=grammar,
                 temperature=0,
                 max_tokens=-1,
-                logits_processor=logits_processor,
             )
             content = response["choices"][0]["message"]["content"]
             raw = json.loads(content)
 
             heuristic = null_unit_heuristic(ingredient_text, raw.get("unit"), raw.get("food"), unit_aliases)
-            raw["unit"] = heuristic["unit"]
+            raw["unit"] = resolve_unit(heuristic["unit"], unit_aliases)
             raw["food"] = heuristic["food"]
             raw["quantity"] = normalize_quantity(raw.get("quantity"))
 
-            if capture and raw["food"] is not None:
-                confidence = capture.food_confidence(model, content, raw["food"])
-                logger.debug(
-                    "Food confidence for %r: food=%r confidence=%.2f",
-                    ingredient_text, raw["food"], confidence,
-                )
-                if confidence < _FOOD_LOGPROB_THRESHOLD:
-                    logger.debug(
-                        "Low-confidence food %r (%.2f) for %r, nulling out",
-                        raw["food"], confidence, ingredient_text,
-                    )
-                    raw["food"] = None
+            if self._food_matcher and foods and raw["food"]:
+                raw["food"] = self._food_matcher.match(raw["food"], foods)
 
             results.append(raw)
 

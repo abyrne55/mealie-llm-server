@@ -4,8 +4,8 @@ from unittest.mock import AsyncMock, MagicMock, patch
 from mealie_llm_server.handlers.ingredient_parsing import (
     extract_ingredients,
     build_nuextract_messages,
-    build_ingredient_schema,
     null_unit_heuristic,
+    resolve_unit,
     normalize_quantity,
 )
 from mealie_llm_server.models import ChatCompletionRequest
@@ -35,23 +35,6 @@ class TestBuildNuextractMessages:
         assert '"note": "verbatim-string"' in content
         assert "# Context:" in content
         assert "1 cup flour" in content
-
-
-class TestBuildIngredientSchema:
-    def test_schema_with_enums(self):
-        foods = ["flour", "sugar", "butter"]
-        units = ["cup", "tablespoon", "teaspoon"]
-        schema = build_ingredient_schema(foods, units)
-        assert schema["properties"]["food"]["enum"] == ["flour", "sugar", "butter", None]
-        assert schema["properties"]["unit"]["enum"] == ["cup", "tablespoon", "teaspoon", None]
-        assert schema["properties"]["quantity"]["type"] == ["number", "null"]
-        assert schema["properties"]["note"]["type"] == ["string", "null"]
-        assert schema["additionalProperties"] is False
-
-    def test_schema_without_enums(self):
-        schema = build_ingredient_schema([], [])
-        assert schema["properties"]["food"]["type"] == ["string", "null"]
-        assert schema["properties"]["unit"]["type"] == ["string", "null"]
 
 
 class TestNullUnitHeuristic:
@@ -112,6 +95,28 @@ class TestNullUnitHeuristic:
         )
         assert result["unit"] is None
         assert result["food"] is None
+
+
+class TestResolveUnit:
+    def test_resolves_canonical(self):
+        aliases = {"cup": ["cup", "cups", "c"], "tablespoon": ["tablespoon", "tbsp"]}
+        assert resolve_unit("cup", aliases) == "cup"
+
+    def test_resolves_alias(self):
+        aliases = {"cup": ["cup", "cups", "c"], "tablespoon": ["tablespoon", "tbsp"]}
+        assert resolve_unit("tbsp", aliases) == "tablespoon"
+
+    def test_resolves_case_insensitive(self):
+        aliases = {"cup": ["cup", "cups", "c"]}
+        assert resolve_unit("Cups", aliases) == "cup"
+
+    def test_returns_none_for_unknown(self):
+        aliases = {"cup": ["cup", "cups"]}
+        assert resolve_unit("pieces", aliases) is None
+
+    def test_returns_none_for_empty(self):
+        assert resolve_unit(None, {}) is None
+        assert resolve_unit("", {}) is None
 
 
 class TestNormalizeQuantity:

@@ -11,9 +11,9 @@ FOODS_RESPONSE = {
     "total": 3,
     "total_pages": 1,
     "items": [
-        {"name": "flour", "plural_name": "flours", "aliases": [{"name": "all-purpose flour"}]},
-        {"name": "egg", "plural_name": "eggs", "aliases": []},
-        {"name": "olive oil", "plural_name": None, "aliases": []},
+        {"name": "flour", "pluralName": "flours", "aliases": [{"name": "all-purpose flour"}]},
+        {"name": "egg", "pluralName": "eggs", "aliases": []},
+        {"name": "olive oil", "pluralName": None, "aliases": []},
     ],
 }
 
@@ -25,23 +25,23 @@ UNITS_RESPONSE = {
     "items": [
         {
             "name": "cup",
-            "plural_name": "cups",
+            "pluralName": "cups",
             "abbreviation": "c",
-            "plural_abbreviation": "",
+            "pluralAbbreviation": "",
             "aliases": [],
         },
         {
             "name": "tablespoon",
-            "plural_name": "tablespoons",
+            "pluralName": "tablespoons",
             "abbreviation": "tbsp",
-            "plural_abbreviation": "tbsps",
+            "pluralAbbreviation": "tbsps",
             "aliases": [{"name": "T"}],
         },
         {
             "name": "teaspoon",
-            "plural_name": "teaspoons",
+            "pluralName": "teaspoons",
             "abbreviation": "tsp",
-            "plural_abbreviation": "",
+            "pluralAbbreviation": "",
             "aliases": [],
         },
     ],
