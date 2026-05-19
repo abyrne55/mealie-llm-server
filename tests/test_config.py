@@ -11,7 +11,8 @@ class TestSettings:
     def test_defaults(self):
         settings = Settings(MEALIE_URL="http://localhost", MEALIE_API_KEY="key")
         assert settings.MEALIE_CACHE_TTL == 300
-        assert settings.MODEL_INGREDIENT_PARSING == "openbmb/MiniCPM-V-4.6-gguf:Q6_K"
+        assert settings.MODEL_INGREDIENT_EXTRACTOR == "DevQuasar-3/numind.NuExtract-tiny-v1.5-GGUF:Q6_K"
+        assert settings.MODEL_INGREDIENT_RESOLVER == "minishlab/potion-retrieval-32M"
         assert settings.MODEL_LOADING_STRATEGY == "all"
         assert settings.MODEL_CONTEXT_SIZE == 4096
         assert settings.MODEL_CACHE_DIR == "/models"
@@ -49,8 +50,8 @@ class TestSettings:
 
     def test_parse_model_id(self):
         settings = Settings(MEALIE_URL="http://localhost", MEALIE_API_KEY="key")
-        repo_id, filename = settings.parse_model_id(settings.MODEL_INGREDIENT_PARSING)
-        assert repo_id == "openbmb/MiniCPM-V-4.6-gguf"
+        repo_id, filename = settings.parse_model_id(settings.MODEL_INGREDIENT_EXTRACTOR)
+        assert repo_id == "DevQuasar-3/numind.NuExtract-tiny-v1.5-GGUF"
         assert filename == "*Q6_K.gguf"
 
     def test_parse_model_id_missing_colon(self):

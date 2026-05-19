@@ -10,8 +10,8 @@ logger = logging.getLogger(__name__)
 _DEFAULT_THRESHOLD = 0.65
 
 
-class FoodMatcher:
-    def __init__(self, model_name: str = "minishlab/potion-retrieval-32M", cache_dir: str | None = None):
+class FoodResolver:
+    def __init__(self, model_name: str, cache_dir: str | None = None):
         logger.info("Loading embedding model %s", model_name)
         self._model = StaticModel.from_pretrained(model_name)
         self._food_names: list[str] = []

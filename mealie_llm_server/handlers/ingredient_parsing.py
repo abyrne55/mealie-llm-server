@@ -13,33 +13,30 @@ from mealie_llm_server.models import ChatCompletionRequest, ChatCompletionRespon
 
 if TYPE_CHECKING:
     from llama_cpp import Llama
-    from mealie_llm_server.food_matcher import FoodMatcher
+    from mealie_llm_server.food_resolver import FoodResolver
     from mealie_llm_server.mealie_client import MealieClient
 
 logger = logging.getLogger(__name__)
 
-_NUEXTRACT_TEMPLATE = """\
+_NUEXTRACT_15_TEMPLATE = """\
+<|input|>
+### Template:
 {
-    "quantity": "number",
-    "unit": "string",
-    "food": "string",
-    "note": "verbatim-string"
-}"""
+    "quantity": "",
+    "unit": "",
+    "food": "",
+    "note": ""
+}
+### Examples:
+1/2 cup milk -> {"quantity": 0.5, "unit": "cup", "food": "milk", "note": ""}
+3 eggs -> {"quantity": 3, "unit": "", "food": "eggs", "note": ""}
+1 1/2 cups broth -> {"quantity": 1.5, "unit": "cups", "food": "broth", "note": ""}
+1 can diced tomatoes -> {"quantity": 1, "unit": "can", "food": "tomatoes", "note": "diced"}
+### Text:
+%s
 
-_CHAT_FEWSHOT_PROMPT = """\
-Extract quantity, unit, food, note from this ingredient as JSON. \
-Convert fractions to decimals (1/2 = 0.5, 1/4 = 0.25, 1 1/2 = 1.5).
-
-Example: 1/2 cup milk -> {"quantity": 0.5, "unit": "cup", "food": "milk", "note": null}
-Example: 2 cloves garlic, minced -> {"quantity": 2, "unit": "cloves", "food": "garlic", "note": "minced"}
-Example: salt to taste -> {"quantity": null, "unit": null, "food": "salt", "note": "to taste"}
-Example: 3 eggs -> {"quantity": 3, "unit": null, "food": "eggs", "note": null}
-Example: 1 1/2 cups chicken broth -> {"quantity": 1.5, "unit": "cups", "food": "chicken broth", "note": null}
-Example: 1 can diced tomatoes -> {"quantity": 1, "unit": "can", "food": "tomatoes", "note": "diced"}
-Example: 8 oz cream cheese, softened -> {"quantity": 8, "unit": "oz", "food": "cream cheese", "note": "softened"}
-Example: 1lb ground chicken -> {"quantity": 1, "unit": "lb", "food": "chicken", "note": "ground"}
-
-Ingredient: %s"""
+<|output|>
+"""
 
 _STRUCTURE_SCHEMA: dict[str, Any] = {
     "type": "object",
@@ -58,11 +55,8 @@ def extract_ingredients(content: str) -> list[str]:
     return json.loads(content)
 
 
-def build_messages(ingredient_text: str, model_id: str) -> list[dict[str, str]]:
-    if "nuextract" in model_id.lower():
-        prompt = f"# Template:\n{_NUEXTRACT_TEMPLATE}\n\n# Context:\n{ingredient_text}"
-    else:
-        prompt = _CHAT_FEWSHOT_PROMPT % ingredient_text
+def build_messages(ingredient_text: str) -> list[dict[str, str]]:
+    prompt = _NUEXTRACT_15_TEMPLATE % ingredient_text
     return [{"role": "user", "content": prompt}]
 
 
@@ -126,15 +120,15 @@ def normalize_quantity(value: Any) -> float | None:
 
 
 class IngredientParsingHandler(Handler):
-    model_key = "ingredient_parsing"
+    model_key = "ingredient_extractor"
 
-    def __init__(self, food_matcher: FoodMatcher | None = None, model_id: str = ""):
+    def __init__(self, food_resolver: FoodResolver | None = None, model_id: str = ""):
         self.reference_prompt = (
             files("mealie_llm_server.prompts")
             .joinpath("parse-recipe-ingredients.txt")
             .read_text()
         )
-        self._food_matcher = food_matcher
+        self._food_resolver = food_resolver
         self._model_id = model_id
 
     async def handle(
@@ -153,7 +147,7 @@ class IngredientParsingHandler(Handler):
 
         results = []
         for ingredient_text in ingredients:
-            messages = build_messages(ingredient_text, self._model_id)
+            messages = build_messages(ingredient_text)
             response = model.create_chat_completion(
                 messages=messages,
                 grammar=grammar,
@@ -168,8 +162,8 @@ class IngredientParsingHandler(Handler):
             raw["food"] = heuristic["food"]
             raw["quantity"] = normalize_quantity(raw.get("quantity"))
 
-            if self._food_matcher and foods and raw["food"]:
-                raw["food"] = self._food_matcher.match(raw["food"], foods)
+            if self._food_resolver and foods and raw["food"]:
+                raw["food"] = self._food_resolver.match(raw["food"], foods)
 
             results.append(raw)
 

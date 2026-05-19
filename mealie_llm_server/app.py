@@ -6,7 +6,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI, Request
 
 from mealie_llm_server.config import Settings
-from mealie_llm_server.food_matcher import FoodMatcher
+from mealie_llm_server.food_resolver import FoodResolver
 from mealie_llm_server.handlers.base import Handler
 from mealie_llm_server.handlers.ingredient_parsing import IngredientParsingHandler
 from mealie_llm_server.mealie_client import MealieClient
@@ -32,7 +32,7 @@ async def lifespan(app: FastAPI):
     )
 
     models_config: dict[str, str | None] = {
-        "ingredient_parsing": settings.MODEL_INGREDIENT_PARSING,
+        "ingredient_extractor": settings.MODEL_INGREDIENT_EXTRACTOR,
         "general": settings.MODEL_GENERAL,
     }
     model_manager = ModelManager(
@@ -53,10 +53,10 @@ async def lifespan(app: FastAPI):
         timeout=settings.UPSTREAM_TIMEOUT,
     )
 
-    food_matcher = FoodMatcher()
+    food_resolver = FoodResolver(model_name=settings.MODEL_INGREDIENT_RESOLVER)
     ingredient_handler = IngredientParsingHandler(
-        food_matcher=food_matcher,
-        model_id=settings.MODEL_INGREDIENT_PARSING,
+        food_resolver=food_resolver,
+        model_id=settings.MODEL_INGREDIENT_EXTRACTOR,
     )
     _HANDLER_REGISTRY["parse-recipe-ingredients"] = ingredient_handler
 

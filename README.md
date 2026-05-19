@@ -1,6 +1,6 @@
 # mealie-llm-server
 
-OpenAI-compatible API gateway for [Mealie](https://mealie.io/) that intercepts ingredient parsing requests and processes them locally using a small language model ([NuExtract-2.0-2B](https://huggingface.co/numind/NuExtract-2.0-2B)) with GBNF grammar-constrained decoding. All other requests are proxied to an upstream cloud API.
+OpenAI-compatible API gateway for [Mealie](https://mealie.io/) that intercepts ingredient parsing requests and processes them locally using a small language model ([NuExtract-tiny-v1.5](https://huggingface.co/numind/NuExtract-tiny-v1.5)) with GBNF grammar-constrained decoding. All other requests are proxied to an upstream cloud API.
 
 ## Quick Start
 
@@ -35,7 +35,7 @@ Mealie ──POST /v1/chat/completions──► mealie-llm-server
                               ┌─────┤           ├─────┐
                               ▼                       ▼
                         Local LLM              Upstream API
-                     (NuExtract-2B)          (OpenAI, etc.)
+                     (NuExtract-tiny)        (OpenAI, etc.)
                      GBNF grammar
                      constrained
 ```
@@ -54,7 +54,8 @@ All environment variables support `_FILE` variants for container secrets (e.g. `
 | `UPSTREAM_URL` | No | — | Upstream OpenAI-compatible API base URL |
 | `UPSTREAM_API_KEY` | No | — | Upstream API key |
 | `UPSTREAM_TIMEOUT` | No | `300` | Upstream request timeout (seconds) |
-| `MODEL_INGREDIENT_PARSING` | No | `numind/NuExtract-2.0-2B-GGUF:Q6_K` | HuggingFace model ID for ingredient parsing |
+| `MODEL_INGREDIENT_EXTRACTOR` | No | `DevQuasar-3/numind.NuExtract-tiny-v1.5-GGUF:Q6_K` | HuggingFace GGUF model for ingredient extraction |
+| `MODEL_INGREDIENT_RESOLVER` | No | `minishlab/potion-retrieval-32M` | model2vec embedding model for food resolution |
 | `MODEL_LOADING_STRATEGY` | No | `all` | `all` (preload at startup) or `swap` (load on demand) |
 | `MODEL_CONTEXT_SIZE` | No | `4096` | LLM context window size |
 | `MODEL_THREADS` | No | auto | Number of CPU threads for inference |

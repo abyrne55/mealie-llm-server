@@ -34,7 +34,7 @@ Request flow: `POST /v1/chat/completions` → Router (jaccard similarity on syst
 
 - **Router** (`router.py`): Matches incoming system prompts against reference Mealie prompts using jaccard similarity.
 - **Handlers** (`handlers/`): Process matched requests locally using llama-cpp-python. `IngredientParsingHandler` extracts ingredients via LLM with GBNF JSON schema enforcement, then resolves foods against the Mealie database using embedding similarity.
-- **Food Matcher** (`food_matcher.py`): Matches extracted food strings to Mealie database entries using model2vec static embeddings (exact match first, then cosine similarity).
+- **Food Resolver** (`food_resolver.py`): Resolves extracted food strings to Mealie database entries using model2vec static embeddings (exact match first, then cosine similarity).
 - **Proxy** (`proxy.py`): Forwards unmatched/multimodal requests to an upstream OpenAI-compatible API.
 - **Model Manager** (`model_manager.py`): Loads/unloads GGUF models with `all` (preload) or `swap` (on-demand) strategies.
 - **Mealie Client** (`mealie_client.py`): Fetches foods/units from Mealie with TTL cache for enum constraints.
@@ -47,8 +47,8 @@ Request flow: `POST /v1/chat/completions` → Router (jaccard similarity on syst
 | `mealie_llm_server/config.py` | Pydantic Settings with `_FILE` support |
 | `mealie_llm_server/models.py` | OpenAI request/response Pydantic models |
 | `mealie_llm_server/router.py` | Jaccard similarity prompt router |
-| `mealie_llm_server/handlers/ingredient_parsing.py` | LLM extraction + post-processing pipeline |
-| `mealie_llm_server/food_matcher.py` | Embedding-based food entity resolution |
+| `mealie_llm_server/handlers/ingredient_parsing.py` | NuExtract extraction + post-processing pipeline |
+| `mealie_llm_server/food_resolver.py` | Embedding-based food entity resolution |
 | `mealie_llm_server/mealie_client.py` | Mealie API client with TTL cache |
 | `mealie_llm_server/model_manager.py` | LLM loading/unloading |
 | `mealie_llm_server/proxy.py` | Upstream reverse proxy |
@@ -65,7 +65,8 @@ All env vars support `_FILE` variants for container secrets (e.g. `MEALIE_API_KE
 | `UPSTREAM_URL` | No | — | Upstream OpenAI-compatible API URL |
 | `UPSTREAM_API_KEY` | No | — | Upstream API key |
 | `UPSTREAM_TIMEOUT` | No | `300` | Upstream request timeout (seconds) |
-| `MODEL_INGREDIENT_PARSING` | No | `openbmb/MiniCPM-V-4.6-gguf:Q6_K` | HF model ID (see below) |
+| `MODEL_INGREDIENT_EXTRACTOR` | No | `DevQuasar-3/numind.NuExtract-tiny-v1.5-GGUF:Q6_K` | HF GGUF model for extraction (see below) |
+| `MODEL_INGREDIENT_RESOLVER` | No | `minishlab/potion-retrieval-32M` | model2vec embedding model for food resolution |
 | `MODEL_LOADING_STRATEGY` | No | `all` | `all` or `swap` |
 | `MODEL_CONTEXT_SIZE` | No | `4096` | Context window size |
 | `MODEL_THREADS` | No | auto | CPU threads for inference |
@@ -75,9 +76,9 @@ All env vars support `_FILE` variants for container secrets (e.g. `MEALIE_API_KE
 
 ## Supported Extraction Models
 
-Set `MODEL_INGREDIENT_PARSING` to switch. The handler auto-detects the prompt format.
+Set `MODEL_INGREDIENT_EXTRACTOR` to switch.
 
-| Model | ID | Speed | Strengths | Weaknesses |
-|---|---|---|---|---|
-| **MiniCPM-V-4.6** (default) | `openbmb/MiniCPM-V-4.6-gguf:Q6_K` | ~5.5s/ingredient | Better unit extraction (bunch, pinch), better notes, smarter food names | Occasional typos, needs few-shot prompt for fractions |
-| NuExtract-2.0-2B | `numind/NuExtract-2.0-2B-GGUF:Q6_K` | ~3.4s/ingredient | Faster, reliable fraction handling, no hallucinations | Misses some units (bunch, pinch), weak notes extraction |
+| Model | ID | Speed | Notes |
+|---|---|---|---|
+| **NuExtract-tiny-v1.5** (default) | `DevQuasar-3/numind.NuExtract-tiny-v1.5-GGUF:Q6_K` | ~1.8s/ingredient | ~0.5GB, few-shot prompt, best speed/accuracy tradeoff |
+| NuExtract-v1.5 | `DevQuasar-3/numind.NuExtract-v1.5-GGUF:Q6_K` | ~3s/ingredient | ~1.5GB, backup if tiny model struggles |

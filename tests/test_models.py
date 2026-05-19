@@ -66,10 +66,10 @@ class TestChatCompletionResponse:
     def test_build_response(self):
         resp = build_chat_completion_response(
             content='{"ingredients": []}',
-            model="nuextract-2.0-2b",
+            model="nuextract-tiny-v1.5",
         )
         assert resp.object == "chat.completion"
         assert resp.choices[0].message.content == '{"ingredients": []}'
         assert resp.choices[0].message.role == "assistant"
-        assert resp.model == "nuextract-2.0-2b"
+        assert resp.model == "nuextract-tiny-v1.5"
         assert resp.id.startswith("chatcmpl-")

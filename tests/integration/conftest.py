@@ -8,7 +8,7 @@ import httpx
 import pytest
 
 from mealie_llm_server.config import Settings
-from mealie_llm_server.food_matcher import FoodMatcher
+from mealie_llm_server.food_resolver import FoodResolver
 from mealie_llm_server.mealie_client import MealieClient
 
 
@@ -56,7 +56,7 @@ def mealie_client(mealie_url, mealie_api_key):
 
 @pytest.fixture(scope="session")
 def model_id() -> str:
-    return os.environ.get("MODEL_INGREDIENT_PARSING", "openbmb/MiniCPM-V-4.6-gguf:Q6_K")
+    return os.environ.get("MODEL_INGREDIENT_EXTRACTOR", "DevQuasar-3/numind.NuExtract-tiny-v1.5-GGUF:Q6_K")
 
 
 @pytest.fixture(scope="session")
@@ -80,8 +80,8 @@ def llm_model(model_id):
 
 
 @pytest.fixture(scope="session")
-def food_matcher():
-    return FoodMatcher()
+def food_resolver():
+    return FoodResolver(model_name="minishlab/potion-retrieval-32M")
 
 
 @pytest.fixture(scope="session")

@@ -12,7 +12,7 @@ def _mock_from_pretrained(**kwargs):
 @pytest.fixture
 def models_config():
     return {
-        "ingredient_parsing": "numind/NuExtract-2.0-2B-GGUF:Q6_K",
+        "ingredient_extractor": "numind/NuExtract-2.0-2B-GGUF:Q6_K",
         "general": None,
     }
 
@@ -24,7 +24,7 @@ class TestModelManager:
         manager = ModelManager(
             models=models_config, strategy="all", n_ctx=4096, n_threads=None, cache_dir=str(tmp_path)
         )
-        manager._load("ingredient_parsing")
+        manager._load("ingredient_extractor")
         mock_llama.from_pretrained.assert_called_once()
         call_kwargs = mock_llama.from_pretrained.call_args
         assert call_kwargs.kwargs["repo_id"] == "numind/NuExtract-2.0-2B-GGUF"
@@ -36,7 +36,7 @@ class TestModelManager:
         manager = ModelManager(
             models=models_config, strategy="all", n_ctx=4096, n_threads=2, cache_dir=str(tmp_path)
         )
-        manager._load("ingredient_parsing")
+        manager._load("ingredient_extractor")
         call_kwargs = mock_llama.from_pretrained.call_args.kwargs
         assert call_kwargs["n_ctx"] == 4096
         assert call_kwargs["n_threads"] == 2
@@ -47,7 +47,7 @@ class TestModelManager:
     async def test_all_strategy_loads_at_startup(self, mock_llama, tmp_path):
         mock_llama.from_pretrained = MagicMock(side_effect=_mock_from_pretrained)
         models = {
-            "ingredient_parsing": "numind/NuExtract-2.0-2B-GGUF:Q6_K",
+            "ingredient_extractor": "numind/NuExtract-2.0-2B-GGUF:Q6_K",
             "general": "some/Model-GGUF:Q4_K_M",
         }
         manager = ModelManager(models=models, strategy="all", n_ctx=4096, n_threads=None, cache_dir=str(tmp_path))
@@ -59,13 +59,13 @@ class TestModelManager:
     async def test_swap_strategy_loads_on_demand(self, mock_llama, tmp_path):
         mock_llama.from_pretrained = MagicMock(side_effect=_mock_from_pretrained)
         models = {
-            "ingredient_parsing": "numind/NuExtract-2.0-2B-GGUF:Q6_K",
+            "ingredient_extractor": "numind/NuExtract-2.0-2B-GGUF:Q6_K",
             "general": "some/Model-GGUF:Q4_K_M",
         }
         manager = ModelManager(models=models, strategy="swap", n_ctx=4096, n_threads=None, cache_dir=str(tmp_path))
         assert mock_llama.from_pretrained.call_count == 0
 
-        async with manager.get_model("ingredient_parsing") as model:
+        async with manager.get_model("ingredient_extractor") as model:
             assert model is not None
         assert mock_llama.from_pretrained.call_count == 1
 
@@ -81,5 +81,5 @@ class TestModelManager:
             models=models_config, strategy="all", n_ctx=4096, n_threads=None, cache_dir=str(tmp_path)
         )
         await manager.load_all()
-        async with manager.get_model("ingredient_parsing") as model:
+        async with manager.get_model("ingredient_extractor") as model:
             assert model is not None

@@ -24,22 +24,16 @@ class TestExtractIngredients:
 
 
 class TestBuildMessages:
-    def test_nuextract_format(self):
-        messages = build_messages("1 cup flour", "numind/NuExtract-2.0-2B-GGUF:Q6_K")
+    def test_nuextract_15_format(self):
+        messages = build_messages("1 cup flour")
         assert len(messages) == 1
         content = messages[0]["content"]
-        assert "# Template:" in content
-        assert '"quantity": "number"' in content
-        assert "# Context:" in content
+        assert "<|input|>" in content
+        assert "### Template:" in content
+        assert "### Examples:" in content
+        assert "### Text:" in content
+        assert "<|output|>" in content
         assert "1 cup flour" in content
-
-    def test_chat_format(self):
-        messages = build_messages("1 cup flour", "openbmb/MiniCPM-V-4.6-gguf:Q6_K")
-        assert len(messages) == 1
-        content = messages[0]["content"]
-        assert "Extract quantity" in content
-        assert "1 cup flour" in content
-        assert "Example:" in content
 
 
 class TestNullUnitHeuristic:

@@ -15,7 +15,8 @@ _FILE_FIELDS = [
     "UPSTREAM_URL",
     "UPSTREAM_API_KEY",
     "UPSTREAM_TIMEOUT",
-    "MODEL_INGREDIENT_PARSING",
+    "MODEL_INGREDIENT_EXTRACTOR",
+    "MODEL_INGREDIENT_RESOLVER",
     "MODEL_GENERAL",
     "MODEL_LOADING_STRATEGY",
     "MODEL_CONTEXT_SIZE",
@@ -35,7 +36,8 @@ class Settings(BaseSettings):
     UPSTREAM_API_KEY: str | None = None
     UPSTREAM_TIMEOUT: int = 300
 
-    MODEL_INGREDIENT_PARSING: str = "openbmb/MiniCPM-V-4.6-gguf:Q6_K"
+    MODEL_INGREDIENT_EXTRACTOR: str = "DevQuasar-3/numind.NuExtract-tiny-v1.5-GGUF:Q6_K"
+    MODEL_INGREDIENT_RESOLVER: str = "minishlab/potion-retrieval-32M"
     MODEL_GENERAL: str | None = None
     MODEL_LOADING_STRATEGY: str = "all"
     MODEL_CONTEXT_SIZE: int = 4096
@@ -51,7 +53,8 @@ class Settings(BaseSettings):
     UPSTREAM_URL_FILE: str | None = None
     UPSTREAM_API_KEY_FILE: str | None = None
     UPSTREAM_TIMEOUT_FILE: str | None = None
-    MODEL_INGREDIENT_PARSING_FILE: str | None = None
+    MODEL_INGREDIENT_EXTRACTOR_FILE: str | None = None
+    MODEL_INGREDIENT_RESOLVER_FILE: str | None = None
     MODEL_GENERAL_FILE: str | None = None
     MODEL_LOADING_STRATEGY_FILE: str | None = None
     MODEL_CONTEXT_SIZE_FILE: str | None = None
