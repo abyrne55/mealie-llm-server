@@ -74,6 +74,20 @@ All env vars support `_FILE` variants for container secrets (e.g. `MEALIE_API_KE
 | `ROUTER_THRESHOLD` | No | `0.6` | Jaccard similarity threshold |
 | `LOG_LEVEL` | No | `info` | Logging level |
 
+## Fine-Tuning Dataset
+
+`tests/integration/ingredients.jsonl` is the training dataset for fine-tuning the extraction model (Unsloth/Axolotl). Each line is a JSON object with an OpenAI `messages` array: a `user` message containing the full NuExtract prompt and an `assistant` message containing the expected JSON output.
+
+**When adding or editing entries, all of the following must hold:**
+
+1. **Schema format**: The assistant content must be single-line JSON with keys in exactly this order: `quantity`, `unit`, `food`, `note`. Use `": "` after colons and `", "` between fields (Python `json.dumps` defaults). No trailing whitespace.
+2. **Key casing**: All keys lowercase — `quantity`, `unit`, `food`, `note`.
+3. **Empty values**: Use `""` (empty string) for absent unit/note, not `null`. This matches the few-shot examples in `_NUEXTRACT_15_TEMPLATE`.
+4. **Prompt generation**: Always use `build_messages()` from `handlers/ingredient_parsing.py` to generate the user message. Do not hand-write the NuExtract template.
+5. **Food values must be exact Mealie DB entries**: Every `food` value must exist verbatim (case-insensitive) in the Mealie test instance seeded by `scripts/start-mealie.sh`. Query the API (`/api/foods?search=<term>`) to verify. If the ingredient text uses a synonym or variant not in the DB, map `food` to the correct DB entry and capture the original qualifier in `note` (e.g., "arborio rice" → `food: "risotto rice"`, `note: "arborio"`).
+6. **Unit values must be known aliases**: Every non-empty `unit` value must appear in the Mealie unit alias map (canonical name, plural, or abbreviation). Check via `/api/units?per_page=-1`.
+7. **No unresolvable foods**: If an ingredient's food cannot be matched to any DB entry, do not include it in the dataset.
+
 ## Supported Extraction Models
 
 Set `MODEL_INGREDIENT_EXTRACTOR` to switch.
