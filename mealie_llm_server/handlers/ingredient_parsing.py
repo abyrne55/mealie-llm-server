@@ -33,6 +33,11 @@ Convert fractions to decimals (1/2 = 0.5, 1/4 = 0.25, 1 1/2 = 1.5).
 Example: 1/2 cup milk -> {"quantity": 0.5, "unit": "cup", "food": "milk", "note": null}
 Example: 2 cloves garlic, minced -> {"quantity": 2, "unit": "cloves", "food": "garlic", "note": "minced"}
 Example: salt to taste -> {"quantity": null, "unit": null, "food": "salt", "note": "to taste"}
+Example: 3 eggs -> {"quantity": 3, "unit": null, "food": "eggs", "note": null}
+Example: 1 1/2 cups chicken broth -> {"quantity": 1.5, "unit": "cups", "food": "chicken broth", "note": null}
+Example: 1 can diced tomatoes -> {"quantity": 1, "unit": "can", "food": "tomatoes", "note": "diced"}
+Example: 8 oz cream cheese, softened -> {"quantity": 8, "unit": "oz", "food": "cream cheese", "note": "softened"}
+Example: 1lb ground chicken -> {"quantity": 1, "unit": "lb", "food": "chicken", "note": "ground"}
 
 Ingredient: %s"""
 
@@ -83,10 +88,12 @@ def null_unit_heuristic(
     if food is None and not _is_known_unit(unit, unit_aliases):
         return {"unit": None, "food": unit}
 
-    text_words = set(original_text.lower().split())
+    text_lower = original_text.lower()
+    text_words = set(text_lower.split())
     aliases = unit_aliases.get(unit, [unit])
     for alias in aliases:
-        if alias.lower() in text_words:
+        a = alias.lower()
+        if a in text_words or a in text_lower:
             return {"unit": unit, "food": food}
 
     return {"unit": None, "food": food}

@@ -101,6 +101,16 @@ class TestNullUnitHeuristic:
         assert result["unit"] is None
         assert result["food"] is None
 
+    def test_keeps_unit_joined_to_number(self):
+        result = null_unit_heuristic(
+            original_text="1lb ground chicken",
+            unit="lb",
+            food="chicken",
+            unit_aliases={"pound": ["pound", "pounds", "lb", "lbs"]},
+        )
+        assert result["unit"] == "lb"
+        assert result["food"] == "chicken"
+
 
 class TestResolveUnit:
     def test_resolves_canonical(self):
