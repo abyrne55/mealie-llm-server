@@ -11,6 +11,14 @@ repos:
       - id: check-merge-conflict
       - id: detect-private-key
 
+  - repo: local
+    hooks:
+      - id: validate-jsonl
+        name: validate training JSONL
+        entry: python scripts/validate_jsonl.py
+        language: python
+        files: \.jsonl$
+
   - repo: https://github.com/astral-sh/ruff-pre-commit
     rev: v0.15.13
     hooks:
