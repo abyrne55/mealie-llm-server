@@ -78,7 +78,7 @@ All env vars support `_FILE` variants for container secrets (e.g. `MEALIE_API_KE
 
 ## Fine-Tuning Dataset
 
-`tests/integration/ingredients.jsonl` is the training dataset for fine-tuning the extraction model (HuggingFace `trl.SFTTrainer` + `peft` LoRA). Each line is a JSON object with an OpenAI `messages` array: a `user` message containing the full NuExtract prompt and an `assistant` message containing the expected JSON output. Fine-tune with `uv sync --group train && uv run python scripts/finetune.py` (CPU) or use `notebooks/finetune.ipynb` (Colab GPU, ~2 min on T4).
+`tests/integration/ingredients.jsonl` is the training dataset for fine-tuning the extraction model (HuggingFace `trl.SFTTrainer` + `peft` LoRA). Each line is a JSON object with an OpenAI `messages` array: a `user` message containing the full NuExtract prompt and an `assistant` message containing the expected JSON output. Fine-tune with `uv sync --group train && uv run python scripts/finetune.py` (CPU) or use `notebooks/finetune.ipynb` (Colab GPU, ~5 min on T4). The dataset is shuffled (seed=42) during training.
 
 ### Expanding the Dataset
 
@@ -111,6 +111,6 @@ Set `MODEL_INGREDIENT_EXTRACTOR` to switch.
 
 | Model | ID | Speed | Notes |
 |---|---|---|---|
-| **NuExtract-tiny-v1.5 fine-tuned** (default) | `abyrne55/nuextract-1.5-tiny-mealie-ingredient-parser:q8_0` | ~1.8s/ingredient | ~0.5GB, LoRA fine-tuned on ingredient dataset, 93% test pass rate |
+| **NuExtract-tiny-v1.5 fine-tuned** (default) | `abyrne55/nuextract-1.5-tiny-mealie-ingredient-parser:q8_0` | ~1.8s/ingredient | ~0.5GB, LoRA fine-tuned on 162-example ingredient dataset (shuffled), 93% training / 97% novel ingredient pass rate |
 | NuExtract-tiny-v1.5 (base) | `DevQuasar-3/numind.NuExtract-tiny-v1.5-GGUF:Q6_K` | ~1.8s/ingredient | ~0.5GB, base model without fine-tuning, 49% test pass rate |
 | NuExtract-v1.5 | `DevQuasar-3/numind.NuExtract-v1.5-GGUF:Q6_K` | ~3s/ingredient | ~1.5GB, larger base model |
