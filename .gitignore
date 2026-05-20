@@ -223,4 +223,5 @@ __marimo__/
 
 # Local
 .tmp/
+models/
 docs/superpowers/

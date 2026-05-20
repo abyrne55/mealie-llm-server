@@ -65,7 +65,7 @@ All env vars support `_FILE` variants for container secrets (e.g. `MEALIE_API_KE
 | `UPSTREAM_URL` | No | — | Upstream OpenAI-compatible API URL |
 | `UPSTREAM_API_KEY` | No | — | Upstream API key |
 | `UPSTREAM_TIMEOUT` | No | `300` | Upstream request timeout (seconds) |
-| `MODEL_INGREDIENT_EXTRACTOR` | No | `DevQuasar-3/numind.NuExtract-tiny-v1.5-GGUF:Q6_K` | HF GGUF model for extraction (see below) |
+| `MODEL_INGREDIENT_EXTRACTOR` | No | `abyrne55/nuextract-1.5-tiny-mealie-ingredient-parser:q8_0` | HF GGUF model for extraction (see below). Also accepts local `.gguf` file paths. |
 | `MODEL_INGREDIENT_RESOLVER` | No | `minishlab/potion-retrieval-32M` | model2vec embedding model for food resolution |
 | `MODEL_LOADING_STRATEGY` | No | `all` | `all` or `swap` |
 | `MODEL_CONTEXT_SIZE` | No | `4096` | Context window size |
@@ -76,13 +76,13 @@ All env vars support `_FILE` variants for container secrets (e.g. `MEALIE_API_KE
 
 ## Fine-Tuning Dataset
 
-`tests/integration/ingredients.jsonl` is the training dataset for fine-tuning the extraction model (Unsloth/Axolotl). Each line is a JSON object with an OpenAI `messages` array: a `user` message containing the full NuExtract prompt and an `assistant` message containing the expected JSON output.
+`tests/integration/ingredients.jsonl` is the training dataset for fine-tuning the extraction model (HuggingFace `trl.SFTTrainer` + `peft` LoRA). Each line is a JSON object with an OpenAI `messages` array: a `user` message containing the full NuExtract prompt and an `assistant` message containing the expected JSON output. Fine-tune with `uv sync --group train && uv run python scripts/finetune.py` (CPU) or use `notebooks/finetune.ipynb` (Colab GPU, ~2 min on T4).
 
 **When adding or editing entries, all of the following must hold:**
 
 1. **Schema format**: The assistant content must be single-line JSON with keys in exactly this order: `quantity`, `unit`, `food`, `note`. Use `": "` after colons and `", "` between fields (Python `json.dumps` defaults). No trailing whitespace.
 2. **Key casing**: All keys lowercase — `quantity`, `unit`, `food`, `note`.
-3. **Empty values**: Use `""` (empty string) for absent unit/note, not `null`. This matches the few-shot examples in `_NUEXTRACT_15_TEMPLATE`.
+3. **Empty values**: Use `""` (empty string) for absent unit/note, not `null`.
 4. **Prompt generation**: Always use `build_messages()` from `handlers/ingredient_parsing.py` to generate the user message. Do not hand-write the NuExtract template.
 5. **Food values must be exact Mealie DB entries**: Every `food` value must exist verbatim (case-insensitive) in the Mealie test instance seeded by `scripts/start-mealie.sh`. Query the API (`/api/foods?search=<term>`) to verify. If the ingredient text uses a synonym or variant not in the DB, map `food` to the correct DB entry and capture the original qualifier in `note` (e.g., "arborio rice" → `food: "risotto rice"`, `note: "arborio"`).
 6. **Unit values must be known aliases**: Every non-empty `unit` value must appear in the Mealie unit alias map (canonical name, plural, or abbreviation). Check via `/api/units?per_page=-1`.
@@ -94,5 +94,6 @@ Set `MODEL_INGREDIENT_EXTRACTOR` to switch.
 
 | Model | ID | Speed | Notes |
 |---|---|---|---|
-| **NuExtract-tiny-v1.5** (default) | `DevQuasar-3/numind.NuExtract-tiny-v1.5-GGUF:Q6_K` | ~1.8s/ingredient | ~0.5GB, few-shot prompt, best speed/accuracy tradeoff |
-| NuExtract-v1.5 | `DevQuasar-3/numind.NuExtract-v1.5-GGUF:Q6_K` | ~3s/ingredient | ~1.5GB, backup if tiny model struggles |
+| **NuExtract-tiny-v1.5 fine-tuned** (default) | `abyrne55/nuextract-1.5-tiny-mealie-ingredient-parser:q8_0` | ~1.8s/ingredient | ~0.5GB, LoRA fine-tuned on ingredient dataset, 93% test pass rate |
+| NuExtract-tiny-v1.5 (base) | `DevQuasar-3/numind.NuExtract-tiny-v1.5-GGUF:Q6_K` | ~1.8s/ingredient | ~0.5GB, base model without fine-tuning, 49% test pass rate |
+| NuExtract-v1.5 | `DevQuasar-3/numind.NuExtract-v1.5-GGUF:Q6_K` | ~3s/ingredient | ~1.5GB, larger base model |

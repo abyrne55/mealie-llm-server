@@ -36,7 +36,7 @@ class Settings(BaseSettings):
     UPSTREAM_API_KEY: str | None = None
     UPSTREAM_TIMEOUT: int = 300
 
-    MODEL_INGREDIENT_EXTRACTOR: str = "DevQuasar-3/numind.NuExtract-tiny-v1.5-GGUF:Q6_K"
+    MODEL_INGREDIENT_EXTRACTOR: str = "abyrne55/nuextract-1.5-tiny-mealie-ingredient-parser:q8_0"
     MODEL_INGREDIENT_RESOLVER: str = "minishlab/potion-retrieval-32M"
     MODEL_GENERAL: str | None = None
     MODEL_LOADING_STRATEGY: str = "all"
@@ -72,6 +72,10 @@ class Settings(BaseSettings):
             if file_path:
                 values[field] = Path(file_path).read_text().strip()
         return values
+
+    @staticmethod
+    def is_local_gguf(model_str: str) -> bool:
+        return model_str.endswith(".gguf") and ("/" in model_str or model_str.startswith("."))
 
     @staticmethod
     def parse_model_id(model_str: str) -> tuple[str, str]:

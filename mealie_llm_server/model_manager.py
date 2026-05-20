@@ -41,16 +41,24 @@ class ModelManager:
         model_id = self._model_configs[key]
         if model_id is None:
             return
-        repo_id, filename = Settings.parse_model_id(model_id)
         logger.info("Loading model %s (%s)", key, model_id)
-        model = Llama.from_pretrained(
-            repo_id=repo_id,
-            filename=filename,
-            n_ctx=self._n_ctx,
-            n_threads=self._n_threads,
-            verbose=False,
-            cache_dir=self._cache_dir,
-        )
+        if Settings.is_local_gguf(model_id):
+            model = Llama(
+                model_path=model_id,
+                n_ctx=self._n_ctx,
+                n_threads=self._n_threads,
+                verbose=False,
+            )
+        else:
+            repo_id, filename = Settings.parse_model_id(model_id)
+            model = Llama.from_pretrained(
+                repo_id=repo_id,
+                filename=filename,
+                n_ctx=self._n_ctx,
+                n_threads=self._n_threads,
+                verbose=False,
+                cache_dir=self._cache_dir,
+            )
         self._loaded[key] = model
         if key not in self._locks:
             self._locks[key] = asyncio.Lock()

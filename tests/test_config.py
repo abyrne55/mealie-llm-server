@@ -11,7 +11,7 @@ class TestSettings:
     def test_defaults(self):
         settings = Settings(MEALIE_URL="http://localhost", MEALIE_API_KEY="key")
         assert settings.MEALIE_CACHE_TTL == 300
-        assert settings.MODEL_INGREDIENT_EXTRACTOR == "DevQuasar-3/numind.NuExtract-tiny-v1.5-GGUF:Q6_K"
+        assert settings.MODEL_INGREDIENT_EXTRACTOR == "abyrne55/nuextract-1.5-tiny-mealie-ingredient-parser:q8_0"
         assert settings.MODEL_INGREDIENT_RESOLVER == "minishlab/potion-retrieval-32M"
         assert settings.MODEL_LOADING_STRATEGY == "all"
         assert settings.MODEL_CONTEXT_SIZE == 4096
@@ -51,8 +51,8 @@ class TestSettings:
     def test_parse_model_id(self):
         settings = Settings(MEALIE_URL="http://localhost", MEALIE_API_KEY="key")
         repo_id, filename = settings.parse_model_id(settings.MODEL_INGREDIENT_EXTRACTOR)
-        assert repo_id == "DevQuasar-3/numind.NuExtract-tiny-v1.5-GGUF"
-        assert filename == "*Q6_K.gguf"
+        assert repo_id == "abyrne55/nuextract-1.5-tiny-mealie-ingredient-parser"
+        assert filename == "*q8_0.gguf"
 
     def test_parse_model_id_missing_colon(self):
         settings = Settings(MEALIE_URL="http://localhost", MEALIE_API_KEY="key")
@@ -78,3 +78,15 @@ class TestSettings:
             ROUTER_THRESHOLD_FILE=str(threshold_file),
         )
         assert settings.ROUTER_THRESHOLD == 0.8
+
+    def test_is_local_gguf_absolute_path(self):
+        assert Settings.is_local_gguf("/models/model.gguf") is True
+
+    def test_is_local_gguf_relative_path(self):
+        assert Settings.is_local_gguf("./models/model.gguf") is True
+
+    def test_is_local_gguf_repo_format(self):
+        assert Settings.is_local_gguf("DevQuasar-3/numind.NuExtract-tiny-v1.5-GGUF:Q6_K") is False
+
+    def test_is_local_gguf_plain_filename(self):
+        assert Settings.is_local_gguf("model.gguf") is False

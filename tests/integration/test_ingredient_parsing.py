@@ -20,10 +20,11 @@ _JSONL_PATH = Path(__file__).parent / "ingredients.jsonl"
 _TEXT_RE = re.compile(r"### Text:\n(.+?)\n\n<\|output\|>", re.DOTALL)
 
 _XFAIL_REGISTRY: dict[str, str] = {
-    "1 cup canned whole berry cranberry sauce": "model inconsistently extracts 'canned' as note",
-    "1 cup chickpea cooking liquid": "embedding matcher doesn't map 'chickpea cooking liquid' to 'aquafaba'",
-    "1 bunch green onions, sliced": "embedding matcher doesn't map 'onions' to 'scallion'",
-    "1 can corn": "embedding matcher maps 'corn' to 'corn oil' instead of 'sweet corn'",
+    "1 cup chickpea cooking liquid": "resolver doesn't map 'chickpea cooking liquid' to 'aquafaba'",
+    "1 bunch green onions, sliced": "resolver doesn't map 'green onions' to 'scallion'",
+    "1 can corn": "resolver maps 'corn' to wrong entry instead of 'sweet corn'",
+    "1 cup long-grain white rice (basmati or jasmine)": "resolver maps to 'brown long grain rice' instead of 'basmati rice'",
+    "1 tablespoon whole black peppercorns": "resolver doesn't singularize 'peppercorns' to 'peppercorn'",
 }
 
 

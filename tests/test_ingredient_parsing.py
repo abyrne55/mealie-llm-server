@@ -30,7 +30,6 @@ class TestBuildMessages:
         content = messages[0]["content"]
         assert "<|input|>" in content
         assert "### Template:" in content
-        assert "### Examples:" in content
         assert "### Text:" in content
         assert "<|output|>" in content
         assert "1 cup flour" in content

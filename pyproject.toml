@@ -16,6 +16,14 @@ dependencies = [
 ]
 
 [dependency-groups]
+train = [
+    "torch>=2.6",
+    "transformers>=4.48",
+    "peft>=0.15",
+    "trl>=0.17",
+    "datasets>=3.3",
+    "accelerate>=1.5",
+]
 dev = [
     "pytest>=8",
     "pytest-asyncio>=1",

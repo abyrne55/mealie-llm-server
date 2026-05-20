@@ -81,3 +81,14 @@ class TestModelManager:
         await manager.load_all()
         async with manager.get_model("ingredient_extractor") as model:
             assert model is not None
+
+    @patch("mealie_llm_server.model_manager.Llama")
+    def test_load_local_gguf_uses_model_path(self, mock_llama, tmp_path):
+        mock_llama.return_value = MagicMock()
+        models = {"ingredient_extractor": "/models/finetuned.gguf"}
+        manager = ModelManager(models=models, strategy="all", n_ctx=4096, n_threads=None, cache_dir=str(tmp_path))
+        manager._load("ingredient_extractor")
+        mock_llama.assert_called_once()
+        call_kwargs = mock_llama.call_args.kwargs
+        assert call_kwargs["model_path"] == "/models/finetuned.gguf"
+        assert "repo_id" not in call_kwargs

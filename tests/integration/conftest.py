@@ -49,7 +49,7 @@ def mealie_client(mealie_url, mealie_api_key):
     try:
         resp = httpx.get(f"{mealie_url}/api/app/about", timeout=5)
         resp.raise_for_status()
-    except (httpx.ConnectError, httpx.HTTPStatusError):
+    except httpx.ConnectError, httpx.HTTPStatusError:
         pytest.skip(f"Mealie not reachable at {mealie_url}")
     return MealieClient(mealie_url, mealie_api_key)
 
@@ -63,16 +63,19 @@ def model_id() -> str:
 def llm_model(model_id):
     from llama_cpp import Llama
 
-    repo_id, filename = Settings.parse_model_id(model_id)
-    cache_dir = os.environ.get("MODEL_CACHE_DIR", str(Path(__file__).resolve().parents[2] / ".tmp" / "models"))
     try:
-        model = Llama.from_pretrained(
-            repo_id=repo_id,
-            filename=filename,
-            n_ctx=4096,
-            verbose=False,
-            cache_dir=cache_dir,
-        )
+        if Settings.is_local_gguf(model_id):
+            model = Llama(model_path=model_id, n_ctx=4096, verbose=False)
+        else:
+            repo_id, filename = Settings.parse_model_id(model_id)
+            cache_dir = os.environ.get("MODEL_CACHE_DIR", str(Path(__file__).resolve().parents[2] / ".tmp" / "models"))
+            model = Llama.from_pretrained(
+                repo_id=repo_id,
+                filename=filename,
+                n_ctx=4096,
+                verbose=False,
+                cache_dir=cache_dir,
+            )
     except Exception as e:
         pytest.skip(f"Failed to load model {model_id}: {e}")
     yield model

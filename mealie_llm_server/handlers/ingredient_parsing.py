@@ -27,11 +27,6 @@ _NUEXTRACT_15_TEMPLATE = """\
     "food": "",
     "note": ""
 }
-### Examples:
-1/3 cup milk -> {"quantity": 0.333, "unit": "cup", "food": "milk", "note": ""}
-3 eggs -> {"quantity": 3, "unit": "", "food": "eggs", "note": ""}
-1 1/2 cups broth -> {"quantity": 1.5, "unit": "cups", "food": "broth", "note": ""}
-1 can diced tomatoes -> {"quantity": 1, "unit": "can", "food": "tomatoes", "note": "diced"}
 ### Text:
 %s
 
