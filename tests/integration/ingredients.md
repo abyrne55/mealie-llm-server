@@ -1,4 +1,4 @@
-# Training Dataset (147 entries)
+# Training Dataset (162 entries)
 
 ## Prompt
 
@@ -168,3 +168,18 @@
 | 145 | 1¾ tsp baking soda | 1.75 | tsp | baking soda |  |
 | 146 | 2¼ tsp baking powder | 2.25 | tsp | baking powder |  |
 | 147 | 1¾ lbs bittersweet chocolate disks or fèves, at least 60 percent cacao content | 1.75 | lbs | chocolate | disks or fèves, bittersweet, ≥60% cacao |
+| 148 | ⅜ cup brown sugar | 0.375 | cup | brown sugar |  |
+| 149 | ⅜ tsp cayenne | 0.375 | tsp | cayenne |  |
+| 150 | 3⅜ cups chicken broth | 3.375 | cups | chicken broth |  |
+| 151 | ⅝ cup flour | 0.625 | cup | flour |  |
+| 152 | 2 ⅝ tbsp olive oil | 2.625 | tbsp | olive oil |  |
+| 153 | ⅞ cup heavy cream | 0.875 | cup | heavy cream |  |
+| 154 | 1⅞ cups chicken stock | 1.875 | cups | chicken stock |  |
+| 155 | ⅖ cup sour cream | 0.4 | cup | sour cream |  |
+| 156 | ⅗ lb ground beef | 0.6 | lb | ground beef |  |
+| 157 | 1 ½ cups rice | 1.5 | cups | rice |  |
+| 158 | 2 ¼ tsp vanilla extract | 2.25 | tsp | vanilla extract |  |
+| 159 | 3 ⅓ tbsp extra-virgin olive oil | 3.333 | tbsp | extra virgin olive oil |  |
+| 160 | 1 ¾ cups soy sauce | 1.75 | cups | soy sauce |  |
+| 161 | 2⅜ tsp baking powder | 2.375 | tsp | baking powder |  |
+| 162 | 1⅝ oz cream cheese | 1.625 | oz | cream cheese |  |
