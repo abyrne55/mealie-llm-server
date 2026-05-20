@@ -46,7 +46,10 @@ _STRUCTURE_SCHEMA: dict[str, Any] = {
 }
 
 
-def extract_ingredients(content: str) -> list[str]:
+def extract_ingredients(content: str | list) -> list[str]:
+    if isinstance(content, list):
+        text = "\n".join(part["text"] for part in content if part.get("type") == "text")
+        return json.loads(text)
     return json.loads(content)
 
 

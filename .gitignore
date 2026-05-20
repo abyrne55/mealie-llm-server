@@ -227,3 +227,4 @@ models/
 docs/superpowers/
 .claude
 .agents
+.models/

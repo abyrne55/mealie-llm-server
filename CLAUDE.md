@@ -52,6 +52,8 @@ Request flow: `POST /v1/chat/completions` → Router (jaccard similarity on syst
 | `mealie_llm_server/mealie_client.py` | Mealie API client with TTL cache |
 | `mealie_llm_server/model_manager.py` | LLM loading/unloading |
 | `mealie_llm_server/proxy.py` | Upstream reverse proxy |
+| `scripts/extract_training_data.py` | Extract JSONL training data from Mealie API + recipe pages |
+| `scripts/validate_jsonl.py` | Validate JSONL dataset format and constraints |
 
 ## Environment Variables
 
@@ -78,7 +80,22 @@ All env vars support `_FILE` variants for container secrets (e.g. `MEALIE_API_KE
 
 `tests/integration/ingredients.jsonl` is the training dataset for fine-tuning the extraction model (HuggingFace `trl.SFTTrainer` + `peft` LoRA). Each line is a JSON object with an OpenAI `messages` array: a `user` message containing the full NuExtract prompt and an `assistant` message containing the expected JSON output. Fine-tune with `uv sync --group train && uv run python scripts/finetune.py` (CPU) or use `notebooks/finetune.ipynb` (Colab GPU, ~2 min on T4).
 
-**When adding or editing entries, all of the following must hold:**
+### Expanding the Dataset
+
+To add new training examples from hand-corrected Mealie recipes:
+
+1. Import recipes into a running Mealie instance and correct the parsed ingredients by hand
+2. Run the extraction script against the Mealie API:
+
+```bash
+uv run python scripts/extract_training_data.py              # uses .env.test
+uv run python scripts/extract_training_data.py --dry-run     # preview without writing
+uv run python scripts/validate_jsonl.py tests/integration/ingredients.jsonl  # validate
+```
+
+The script fetches all recipes from Mealie, scrapes the original recipe pages for raw ingredient text, filters to foods in the default en-US seed database (from `../mealie`), and appends new deduplicated entries to the JSONL. Requires `MEALIE_URL` and `MEALIE_API_KEY` (from env, `.env.test`, or `--mealie-url`/`--mealie-api-key` flags).
+
+**When adding or editing entries manually, all of the following must hold:**
 
 1. **Schema format**: The assistant content must be single-line JSON with keys in exactly this order: `quantity`, `unit`, `food`, `note`. Use `": "` after colons and `", "` between fields (Python `json.dumps` defaults). No trailing whitespace.
 2. **Key casing**: All keys lowercase — `quantity`, `unit`, `food`, `note`.

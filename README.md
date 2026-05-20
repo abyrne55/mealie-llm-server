@@ -19,7 +19,12 @@ Then point Mealie at this server:
 
 ```
 OPENAI_BASE_URL=http://mealie-llm-server:8000/v1
+OPENAI_API_KEY=sk-dummy
+OPENAI_WORKERS=1
+OPENAI_REQUEST_TIMEOUT=300
 ```
+
+`OPENAI_WORKERS=1` is recommended because the LLM server processes ingredients sequentially — multiple workers just queue requests without any speedup. `OPENAI_REQUEST_TIMEOUT=300` (5 minutes) allows headroom for recipes with many ingredients (~1.8s each).
 
 ## How It Works
 

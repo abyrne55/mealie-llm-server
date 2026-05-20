@@ -19,6 +19,13 @@ repos:
         language: python
         files: \.jsonl$
 
+      - id: sync-ingredients-md
+        name: sync ingredients.md
+        entry: python scripts/jsonl_to_markdown.py tests/integration/ingredients.jsonl
+        language: python
+        files: ingredients\.(jsonl|md)$
+        pass_filenames: false
+
   - repo: https://github.com/astral-sh/ruff-pre-commit
     rev: v0.15.13
     hooks:
