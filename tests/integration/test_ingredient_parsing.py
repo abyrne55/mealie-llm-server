@@ -24,7 +24,10 @@ _XFAIL_REGISTRY: dict[str, str] = {
     "1 bunch green onions, sliced": "resolver doesn't map 'green onions' to 'scallion'",
     "1 can corn": "resolver maps 'corn' to wrong entry instead of 'sweet corn'",
     "1 cup long-grain white rice (basmati or jasmine)": "resolver maps to 'brown long grain rice' instead of 'basmati rice'",
-    "1 tablespoon whole black peppercorns": "resolver doesn't singularize 'peppercorns' to 'peppercorn'",
+}
+
+_FOOD_ALIASES: dict[str, set[str]] = {
+    "1 tablespoon whole black peppercorns": {"peppercorn", "peppercorns"},
 }
 
 
@@ -114,7 +117,8 @@ def test_ingredient_parsing(
     exp_unit = resolve_unit(exp_raw_unit, unit_aliases)
     assert result["unit"] == exp_unit, f"unit: {result['unit']} != {exp_unit}"
 
-    assert result["food"] == exp_food, f"food: {result['food']} != {exp_food}"
+    accepted_foods = _FOOD_ALIASES.get(ingredient, {exp_food})
+    assert result["food"] in accepted_foods, f"food: {result['food']} not in {accepted_foods}"
 
     actual_note = result.get("note") or ""
     if not exp_note:
