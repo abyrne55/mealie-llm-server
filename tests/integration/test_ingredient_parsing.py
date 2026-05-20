@@ -65,9 +65,15 @@ NOTES_CASES = [
 
 NOTES_SUBSTRING_CASES = [
     ("3 medium potatoes, peeled and cubed", 3.0, None, {"potato", "potatoes"}, "peeled"),
-    pytest.param("1 cup canned whole berry cranberry sauce", 1.0, "cup", {"cranberry sauce"}, "canned",
-                 id="1 cup canned whole berry cranberry sauce",
-                 marks=pytest.mark.xfail(reason="model inconsistently extracts 'canned' as note")),
+    pytest.param(
+        "1 cup canned whole berry cranberry sauce",
+        1.0,
+        "cup",
+        {"cranberry sauce"},
+        "canned",
+        id="1 cup canned whole berry cranberry sauce",
+        marks=pytest.mark.xfail(reason="model inconsistently extracts 'canned' as note"),
+    ),
 ]
 
 CHOWDOWN_CASES = [
@@ -86,15 +92,33 @@ NO_MATCH_CASES = [
 ]
 
 STRETCH_CASES = [
-    pytest.param("1 cup chickpea cooking liquid", 1.0, "cup", {"aquafaba"}, None,
-                 id="1 cup chickpea cooking liquid",
-                 marks=pytest.mark.xfail(reason="embedding matcher doesn't map 'chickpea cooking liquid' to 'aquafaba'")),
-    pytest.param("1 bunch green onions, sliced", 1.0, "bunch", {"scallion", "scallions"}, "sliced",
-                 id="1 bunch green onions, sliced",
-                 marks=pytest.mark.xfail(reason="embedding matcher doesn't map 'onions' to 'scallion'")),
-    pytest.param("1 can corn", 1.0, "can", {"sweet corn", "canned corn", "corn"}, None,
-                 id="1 can corn",
-                 marks=pytest.mark.xfail(reason="embedding matcher maps 'corn' to 'corn oil' instead of 'sweet corn'")),
+    pytest.param(
+        "1 cup chickpea cooking liquid",
+        1.0,
+        "cup",
+        {"aquafaba"},
+        None,
+        id="1 cup chickpea cooking liquid",
+        marks=pytest.mark.xfail(reason="embedding matcher doesn't map 'chickpea cooking liquid' to 'aquafaba'"),
+    ),
+    pytest.param(
+        "1 bunch green onions, sliced",
+        1.0,
+        "bunch",
+        {"scallion", "scallions"},
+        "sliced",
+        id="1 bunch green onions, sliced",
+        marks=pytest.mark.xfail(reason="embedding matcher doesn't map 'onions' to 'scallion'"),
+    ),
+    pytest.param(
+        "1 can corn",
+        1.0,
+        "can",
+        {"sweet corn", "canned corn", "corn"},
+        None,
+        id="1 can corn",
+        marks=pytest.mark.xfail(reason="embedding matcher maps 'corn' to 'corn oil' instead of 'sweet corn'"),
+    ),
 ]
 
 
@@ -124,15 +148,18 @@ def test_exact_note(ingredient, exp_qty, exp_unit, exp_foods, exp_note, llm_mode
     NOTES_SUBSTRING_CASES + CHOWDOWN_LEMON_ZEST,
     ids=[c.id if hasattr(c, "id") else c[0] for c in NOTES_SUBSTRING_CASES + CHOWDOWN_LEMON_ZEST],
 )
-def test_note_contains(ingredient, exp_qty, exp_unit, exp_foods, note_substr, llm_model, food_resolver, foods, unit_aliases):
+def test_note_contains(
+    ingredient, exp_qty, exp_unit, exp_foods, note_substr, llm_model, food_resolver, foods, unit_aliases
+):
     result = parse_ingredient(ingredient, llm_model, food_resolver, foods, unit_aliases)
     assert result["quantity"] == exp_qty, f"quantity: {result['quantity']} != {exp_qty}"
     assert result["unit"] == exp_unit, f"unit: {result['unit']} != {exp_unit}"
     assert result["food"] in exp_foods, f"food: {result['food']} not in {exp_foods}"
     food_str = result["food"] or ""
     note_str = result["note"] or ""
-    assert note_substr.lower() in note_str.lower() or note_substr.lower() in food_str.lower(), \
+    assert note_substr.lower() in note_str.lower() or note_substr.lower() in food_str.lower(), (
         f"'{note_substr}' not found in note={result['note']!r} or food={result['food']!r}"
+    )
 
 
 @pytest.mark.parametrize(
@@ -152,7 +179,9 @@ def test_no_food_match(ingredient, exp_qty, exp_unit, exp_food_none, llm_model, 
     STRETCH_CASES,
     ids=[c.id if hasattr(c, "id") else c[0] for c in STRETCH_CASES],
 )
-def test_stretch_synonym_resolution(ingredient, exp_qty, exp_unit, exp_foods, exp_note, llm_model, food_resolver, foods, unit_aliases):
+def test_stretch_synonym_resolution(
+    ingredient, exp_qty, exp_unit, exp_foods, exp_note, llm_model, food_resolver, foods, unit_aliases
+):
     result = parse_ingredient(ingredient, llm_model, food_resolver, foods, unit_aliases)
     assert result["quantity"] == exp_qty, f"quantity: {result['quantity']} != {exp_qty}"
     assert result["unit"] == exp_unit, f"unit: {result['unit']} != {exp_unit}"

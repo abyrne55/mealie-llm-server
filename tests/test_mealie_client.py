@@ -146,12 +146,8 @@ class TestStaleOnError:
     @respx.mock
     @pytest.mark.asyncio
     async def test_graceful_degradation_on_first_fetch_failure(self, client):
-        respx.get("http://mealie.test:9000/api/foods", params={"perPage": "-1"}).mock(
-            return_value=httpx.Response(500)
-        )
-        respx.get("http://mealie.test:9000/api/units", params={"perPage": "-1"}).mock(
-            return_value=httpx.Response(500)
-        )
+        respx.get("http://mealie.test:9000/api/foods", params={"perPage": "-1"}).mock(return_value=httpx.Response(500))
+        respx.get("http://mealie.test:9000/api/units", params={"perPage": "-1"}).mock(return_value=httpx.Response(500))
         foods = await client.get_foods()
         units = await client.get_units()
         assert foods == []

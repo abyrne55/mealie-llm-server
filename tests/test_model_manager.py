@@ -33,9 +33,7 @@ class TestModelManager:
     @patch("mealie_llm_server.model_manager.Llama")
     def test_load_model_calls_from_pretrained(self, mock_llama, models_config, tmp_path):
         mock_llama.from_pretrained = MagicMock(side_effect=_mock_from_pretrained)
-        manager = ModelManager(
-            models=models_config, strategy="all", n_ctx=4096, n_threads=2, cache_dir=str(tmp_path)
-        )
+        manager = ModelManager(models=models_config, strategy="all", n_ctx=4096, n_threads=2, cache_dir=str(tmp_path))
         manager._load("ingredient_extractor")
         call_kwargs = mock_llama.from_pretrained.call_args.kwargs
         assert call_kwargs["n_ctx"] == 4096

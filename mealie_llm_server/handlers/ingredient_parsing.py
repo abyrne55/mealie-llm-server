@@ -123,11 +123,7 @@ class IngredientParsingHandler(Handler):
     model_key = "ingredient_extractor"
 
     def __init__(self, food_resolver: FoodResolver | None = None, model_id: str = ""):
-        self.reference_prompt = (
-            files("mealie_llm_server.prompts")
-            .joinpath("parse-recipe-ingredients.txt")
-            .read_text()
-        )
+        self.reference_prompt = files("mealie_llm_server.prompts").joinpath("parse-recipe-ingredients.txt").read_text()
         self._food_resolver = food_resolver
         self._model_id = model_id
 

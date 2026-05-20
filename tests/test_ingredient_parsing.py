@@ -162,27 +162,27 @@ class TestIngredientParsingHandler:
 
     def _make_mock_model(self, responses):
         model = MagicMock()
-        model.create_chat_completion = MagicMock(side_effect=[
-            {"choices": [{"message": {"content": json.dumps(r)}}]}
-            for r in responses
-        ])
+        model.create_chat_completion = MagicMock(
+            side_effect=[{"choices": [{"message": {"content": json.dumps(r)}}]} for r in responses]
+        )
         return model
 
     @pytest.mark.asyncio
     async def test_handle_single_ingredient(self):
         from mealie_llm_server.handlers.ingredient_parsing import IngredientParsingHandler
+
         handler = IngredientParsingHandler()
         mealie = self._make_mock_mealie()
-        model = self._make_mock_model([
-            {"quantity": 1, "unit": "cup", "food": "flour", "note": None}
-        ])
-        request = ChatCompletionRequest.model_validate({
-            "model": "gpt-4o",
-            "messages": [
-                {"role": "system", "content": "Parse ingredient strings into components."},
-                {"role": "user", "content": '["1 cup flour"]'},
-            ],
-        })
+        model = self._make_mock_model([{"quantity": 1, "unit": "cup", "food": "flour", "note": None}])
+        request = ChatCompletionRequest.model_validate(
+            {
+                "model": "gpt-4o",
+                "messages": [
+                    {"role": "system", "content": "Parse ingredient strings into components."},
+                    {"role": "user", "content": '["1 cup flour"]'},
+                ],
+            }
+        )
         with patch("mealie_llm_server.handlers.ingredient_parsing.LlamaGrammar"):
             response = await handler.handle(request, model, mealie)
         result = json.loads(response.choices[0].message.content)
@@ -193,19 +193,24 @@ class TestIngredientParsingHandler:
     @pytest.mark.asyncio
     async def test_handle_batch_preserves_order(self):
         from mealie_llm_server.handlers.ingredient_parsing import IngredientParsingHandler
+
         handler = IngredientParsingHandler()
         mealie = self._make_mock_mealie()
-        model = self._make_mock_model([
-            {"quantity": 1, "unit": "cup", "food": "flour", "note": None},
-            {"quantity": 2, "unit": None, "food": "egg", "note": None},
-        ])
-        request = ChatCompletionRequest.model_validate({
-            "model": "gpt-4o",
-            "messages": [
-                {"role": "system", "content": "Parse ingredient strings into components."},
-                {"role": "user", "content": '["1 cup flour", "2 eggs"]'},
-            ],
-        })
+        model = self._make_mock_model(
+            [
+                {"quantity": 1, "unit": "cup", "food": "flour", "note": None},
+                {"quantity": 2, "unit": None, "food": "egg", "note": None},
+            ]
+        )
+        request = ChatCompletionRequest.model_validate(
+            {
+                "model": "gpt-4o",
+                "messages": [
+                    {"role": "system", "content": "Parse ingredient strings into components."},
+                    {"role": "user", "content": '["1 cup flour", "2 eggs"]'},
+                ],
+            }
+        )
         with patch("mealie_llm_server.handlers.ingredient_parsing.LlamaGrammar"):
             response = await handler.handle(request, model, mealie)
         result = json.loads(response.choices[0].message.content)
