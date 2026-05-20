@@ -12,7 +12,7 @@ docker run -d \
   -e MEALIE_API_KEY=your-mealie-api-key \
   -e UPSTREAM_URL=https://api.openai.com/v1 \
   -e UPSTREAM_API_KEY=sk-... \
-  ghcr.io/abyrne/mealie-llm-server:latest
+  ghcr.io/abyrne/mealie-llm-server:main
 ```
 
 Then point Mealie at this server:
