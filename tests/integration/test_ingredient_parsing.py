@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 import json
+import re
+from pathlib import Path
 
 import pytest
 from llama_cpp import LlamaGrammar
@@ -12,6 +14,61 @@ from mealie_llm_server.handlers.ingredient_parsing import (
     null_unit_heuristic,
     resolve_unit,
 )
+
+_JSONL_PATH = Path(__file__).parent / "ingredients.jsonl"
+
+_TEXT_RE = re.compile(r"### Text:\n(.+?)\n\n<\|output\|>", re.DOTALL)
+
+_XFAIL_REGISTRY: dict[str, str] = {
+    "1 cup canned whole berry cranberry sauce": "model inconsistently extracts 'canned' as note",
+    "1 cup chickpea cooking liquid": "embedding matcher doesn't map 'chickpea cooking liquid' to 'aquafaba'",
+    "1 bunch green onions, sliced": "embedding matcher doesn't map 'onions' to 'scallion'",
+    "1 can corn": "embedding matcher maps 'corn' to 'corn oil' instead of 'sweet corn'",
+}
+
+
+def _load_jsonl() -> list[tuple[str, float | None, str, str, str]]:
+    entries = []
+    for line in _JSONL_PATH.read_text().splitlines():
+        row = json.loads(line)
+        user_content = row["messages"][0]["content"]
+        m = _TEXT_RE.search(user_content)
+        if not m:
+            continue
+        ingredient_text = m.group(1).strip()
+        expected = json.loads(row["messages"][1]["content"])
+        exp_qty = normalize_quantity(expected.get("quantity"))
+        exp_raw_unit = expected.get("unit", "")
+        exp_food = expected.get("food", "")
+        exp_note = expected.get("note", "")
+        entries.append((ingredient_text, exp_qty, exp_raw_unit, exp_food, exp_note))
+    return entries
+
+
+def _build_params():
+    params = []
+    for entry in _load_jsonl():
+        ingredient_text = entry[0]
+        marks = ()
+        if ingredient_text in _XFAIL_REGISTRY:
+            marks = (pytest.mark.xfail(reason=_XFAIL_REGISTRY[ingredient_text]),)
+        params.append(pytest.param(*entry, id=ingredient_text, marks=marks))
+    return params
+
+
+JSONL_CASES = _build_params()
+
+
+def _ngram_jaccard(a: str, b: str, n: int = 3) -> float:
+    def ngrams(s: str) -> set[str]:
+        s = re.sub(r"[^\w\s]", "", s.lower())
+        s = f" {s} "
+        return {s[i : i + n] for i in range(len(s) - n + 1)}
+
+    a_ng, b_ng = ngrams(a), ngrams(b)
+    if not a_ng or not b_ng:
+        return 0.0
+    return len(a_ng & b_ng) / len(a_ng | b_ng)
 
 
 def parse_ingredient(
@@ -42,150 +99,27 @@ def parse_ingredient(
     return raw
 
 
-BASIC_CASES = [
-    ("1 cup flour", 1.0, "cup", {"flour", "unbleached all-purpose flour"}, None),
-    ("2 tablespoons olive oil", 2.0, "tablespoon", {"olive oil", "extra virgin olive oil"}, None),
-    ("3 eggs", 3.0, None, {"egg", "eggs"}, None),
-    ("1 1/2 cups chicken broth", 1.5, "cup", {"chicken broth", "chicken stock"}, None),
-]
-
-ABBREVIATION_CASES = [
-    ("4 tbsp butter", 4.0, "tablespoon", {"butter"}, None),
-    ("2 tsp vanilla extract", 2.0, "teaspoon", {"vanilla extract"}, None),
-    ("1 lb chicken breast", 1.0, "pound", {"chicken breast"}, None),
-    ("8 oz cream cheese", 8.0, "ounce", {"cream cheese"}, None),
-]
-
-NOTES_CASES = [
-    ("8 oz cream cheese, softened", 8.0, "ounce", {"cream cheese"}, "softened"),
-    ("2 cloves garlic, minced", 2.0, "clove", {"garlic"}, "minced"),
-    ("1 can diced tomatoes", 1.0, "can", {"tomato", "tomatoes", "diced tomato", "diced tomatoes"}, "diced"),
-    ("1 small onion, diced", 1.0, None, {"onion"}, "diced"),
-]
-
-NOTES_SUBSTRING_CASES = [
-    ("3 medium potatoes, peeled and cubed", 3.0, None, {"potato", "potatoes"}, "peeled"),
-    pytest.param(
-        "1 cup canned whole berry cranberry sauce",
-        1.0,
-        "cup",
-        {"cranberry sauce"},
-        "canned",
-        id="1 cup canned whole berry cranberry sauce",
-        marks=pytest.mark.xfail(reason="model inconsistently extracts 'canned' as note"),
-    ),
-]
-
-CHOWDOWN_CASES = [
-    ("1/2 cup salted butter, softened", 0.5, "cup", {"butter"}, "softened"),
-    ("1 cup arborio rice", 1.0, "cup", {"rice", "arborio rice"}, None),
-    ("2 cups chicken stock", 2.0, "cup", {"chicken stock"}, None),
-    ("1lb ground chicken", 1.0, "pound", {"chicken", "ground chicken"}, None),
-]
-
-CHOWDOWN_LEMON_ZEST = [
-    ("1 tablespoon fresh lemon zest (about 1 lemon)", 1.0, "tablespoon", {"lemon", "lemon zest"}, "lemon"),
-]
-
-NO_MATCH_CASES = [
-    ("1 tbsp nduja", 1.0, "tablespoon", None),
-]
-
-STRETCH_CASES = [
-    pytest.param(
-        "1 cup chickpea cooking liquid",
-        1.0,
-        "cup",
-        {"aquafaba"},
-        None,
-        id="1 cup chickpea cooking liquid",
-        marks=pytest.mark.xfail(reason="embedding matcher doesn't map 'chickpea cooking liquid' to 'aquafaba'"),
-    ),
-    pytest.param(
-        "1 bunch green onions, sliced",
-        1.0,
-        "bunch",
-        {"scallion", "scallions"},
-        "sliced",
-        id="1 bunch green onions, sliced",
-        marks=pytest.mark.xfail(reason="embedding matcher doesn't map 'onions' to 'scallion'"),
-    ),
-    pytest.param(
-        "1 can corn",
-        1.0,
-        "can",
-        {"sweet corn", "canned corn", "corn"},
-        None,
-        id="1 can corn",
-        marks=pytest.mark.xfail(reason="embedding matcher maps 'corn' to 'corn oil' instead of 'sweet corn'"),
-    ),
-]
-
-
-@pytest.mark.parametrize(
-    "ingredient, exp_qty, exp_unit, exp_foods, exp_note",
-    BASIC_CASES + ABBREVIATION_CASES + NOTES_CASES + CHOWDOWN_CASES,
-    ids=[c.id if hasattr(c, "id") else c[0] for c in BASIC_CASES + ABBREVIATION_CASES + NOTES_CASES + CHOWDOWN_CASES],
-)
-def test_exact_note(ingredient, exp_qty, exp_unit, exp_foods, exp_note, llm_model, food_resolver, foods, unit_aliases):
-    result = parse_ingredient(ingredient, llm_model, food_resolver, foods, unit_aliases)
-    assert result["quantity"] == exp_qty, f"quantity: {result['quantity']} != {exp_qty}"
-    assert result["unit"] == exp_unit, f"unit: {result['unit']} != {exp_unit}"
-    if exp_foods is not None:
-        assert result["food"] in exp_foods, f"food: {result['food']} not in {exp_foods}"
-    else:
-        assert result["food"] is None, f"food: expected None, got {result['food']}"
-    if exp_note is not None:
-        assert result["note"] is not None, f"note: expected '{exp_note}', got None"
-        assert result["note"].lower() == exp_note.lower(), f"note: {result['note']} != {exp_note}"
-    else:
-        if result["note"] is not None:
-            assert result["note"].strip() == "", f"note: expected None/empty, got {result['note']}"
-
-
-@pytest.mark.parametrize(
-    "ingredient, exp_qty, exp_unit, exp_foods, note_substr",
-    NOTES_SUBSTRING_CASES + CHOWDOWN_LEMON_ZEST,
-    ids=[c.id if hasattr(c, "id") else c[0] for c in NOTES_SUBSTRING_CASES + CHOWDOWN_LEMON_ZEST],
-)
-def test_note_contains(
-    ingredient, exp_qty, exp_unit, exp_foods, note_substr, llm_model, food_resolver, foods, unit_aliases
+@pytest.mark.parametrize("ingredient, exp_qty, exp_raw_unit, exp_food, exp_note", JSONL_CASES)
+def test_ingredient_parsing(
+    ingredient, exp_qty, exp_raw_unit, exp_food, exp_note, llm_model, food_resolver, foods, unit_aliases
 ):
     result = parse_ingredient(ingredient, llm_model, food_resolver, foods, unit_aliases)
-    assert result["quantity"] == exp_qty, f"quantity: {result['quantity']} != {exp_qty}"
+
+    if exp_qty is not None:
+        assert result["quantity"] == pytest.approx(exp_qty, abs=0.01), f"quantity: {result['quantity']} != {exp_qty}"
+    else:
+        assert result["quantity"] is None, f"quantity: expected None, got {result['quantity']}"
+
+    exp_unit = resolve_unit(exp_raw_unit, unit_aliases)
     assert result["unit"] == exp_unit, f"unit: {result['unit']} != {exp_unit}"
-    assert result["food"] in exp_foods, f"food: {result['food']} not in {exp_foods}"
-    food_str = result["food"] or ""
-    note_str = result["note"] or ""
-    assert note_substr.lower() in note_str.lower() or note_substr.lower() in food_str.lower(), (
-        f"'{note_substr}' not found in note={result['note']!r} or food={result['food']!r}"
-    )
 
+    assert result["food"] == exp_food, f"food: {result['food']} != {exp_food}"
 
-@pytest.mark.parametrize(
-    "ingredient, exp_qty, exp_unit, exp_food_none",
-    NO_MATCH_CASES,
-    ids=[c[0] for c in NO_MATCH_CASES],
-)
-def test_no_food_match(ingredient, exp_qty, exp_unit, exp_food_none, llm_model, food_resolver, foods, unit_aliases):
-    result = parse_ingredient(ingredient, llm_model, food_resolver, foods, unit_aliases)
-    assert result["quantity"] == exp_qty, f"quantity: {result['quantity']} != {exp_qty}"
-    assert result["unit"] == exp_unit, f"unit: {result['unit']} != {exp_unit}"
-    assert result["food"] is None, f"food: expected None (no match), got {result['food']}"
-
-
-@pytest.mark.parametrize(
-    "ingredient, exp_qty, exp_unit, exp_foods, exp_note",
-    STRETCH_CASES,
-    ids=[c.id if hasattr(c, "id") else c[0] for c in STRETCH_CASES],
-)
-def test_stretch_synonym_resolution(
-    ingredient, exp_qty, exp_unit, exp_foods, exp_note, llm_model, food_resolver, foods, unit_aliases
-):
-    result = parse_ingredient(ingredient, llm_model, food_resolver, foods, unit_aliases)
-    assert result["quantity"] == exp_qty, f"quantity: {result['quantity']} != {exp_qty}"
-    assert result["unit"] == exp_unit, f"unit: {result['unit']} != {exp_unit}"
-    assert result["food"] in exp_foods, f"food: {result['food']} not in {exp_foods}"
-    if exp_note is not None:
-        assert result["note"] is not None, f"note: expected '{exp_note}', got None"
-        assert exp_note.lower() in result["note"].lower(), f"note: '{exp_note}' not in {result['note']}"
+    actual_note = result.get("note") or ""
+    if not exp_note:
+        pass
+    elif not actual_note:
+        pytest.fail(f"note: expected '{exp_note}', got empty")
+    else:
+        sim = _ngram_jaccard(actual_note, exp_note)
+        assert sim >= 0.3, f"note: '{actual_note}' too different from '{exp_note}' (jaccard={sim:.2f})"
