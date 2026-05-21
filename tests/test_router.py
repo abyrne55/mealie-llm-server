@@ -1,10 +1,10 @@
 import pytest
 from importlib.resources import files
-from mealie_llm_server.router import Router, tokenize, jaccard_similarity
+from mealie_local_ai.router import Router, tokenize, jaccard_similarity
 
 
 def _load_prompt(name: str) -> str:
-    return files("mealie_llm_server.prompts").joinpath(name).read_text()
+    return files("mealie_local_ai.prompts").joinpath(name).read_text()
 
 
 class TestTokenize:

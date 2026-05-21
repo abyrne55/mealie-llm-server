@@ -1,5 +1,5 @@
 import pytest
-from mealie_llm_server.config import Settings
+from mealie_local_ai.config import Settings
 
 
 @pytest.fixture

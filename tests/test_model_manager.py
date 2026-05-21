@@ -1,6 +1,6 @@
 import pytest
 from unittest.mock import MagicMock, patch
-from mealie_llm_server.model_manager import ModelManager
+from mealie_local_ai.model_manager import ModelManager
 
 
 def _mock_from_pretrained(**kwargs):
@@ -18,7 +18,7 @@ def models_config():
 
 
 class TestModelManager:
-    @patch("mealie_llm_server.model_manager.Llama")
+    @patch("mealie_local_ai.model_manager.Llama")
     def test_load_model_parses_id_correctly(self, mock_llama, models_config, tmp_path):
         mock_llama.from_pretrained = MagicMock(side_effect=_mock_from_pretrained)
         manager = ModelManager(
@@ -30,7 +30,7 @@ class TestModelManager:
         assert call_kwargs.kwargs["repo_id"] == "numind/NuExtract-2.0-2B-GGUF"
         assert call_kwargs.kwargs["filename"] == "*Q6_K.gguf"
 
-    @patch("mealie_llm_server.model_manager.Llama")
+    @patch("mealie_local_ai.model_manager.Llama")
     def test_load_model_calls_from_pretrained(self, mock_llama, models_config, tmp_path):
         mock_llama.from_pretrained = MagicMock(side_effect=_mock_from_pretrained)
         manager = ModelManager(models=models_config, strategy="all", n_ctx=4096, n_threads=2, cache_dir=str(tmp_path))
@@ -40,7 +40,7 @@ class TestModelManager:
         assert call_kwargs["n_threads"] == 2
         assert call_kwargs["verbose"] is False
 
-    @patch("mealie_llm_server.model_manager.Llama")
+    @patch("mealie_local_ai.model_manager.Llama")
     @pytest.mark.asyncio
     async def test_all_strategy_loads_at_startup(self, mock_llama, tmp_path):
         mock_llama.from_pretrained = MagicMock(side_effect=_mock_from_pretrained)
@@ -52,7 +52,7 @@ class TestModelManager:
         await manager.load_all()
         assert mock_llama.from_pretrained.call_count == 2
 
-    @patch("mealie_llm_server.model_manager.Llama")
+    @patch("mealie_local_ai.model_manager.Llama")
     @pytest.mark.asyncio
     async def test_swap_strategy_loads_on_demand(self, mock_llama, tmp_path):
         mock_llama.from_pretrained = MagicMock(side_effect=_mock_from_pretrained)
@@ -71,7 +71,7 @@ class TestModelManager:
             assert model is not None
         assert mock_llama.from_pretrained.call_count == 2
 
-    @patch("mealie_llm_server.model_manager.Llama")
+    @patch("mealie_local_ai.model_manager.Llama")
     @pytest.mark.asyncio
     async def test_get_model_returns_lock_context(self, mock_llama, models_config, tmp_path):
         mock_llama.from_pretrained = MagicMock(side_effect=_mock_from_pretrained)
@@ -82,7 +82,7 @@ class TestModelManager:
         async with manager.get_model("ingredient_extractor") as model:
             assert model is not None
 
-    @patch("mealie_llm_server.model_manager.Llama")
+    @patch("mealie_local_ai.model_manager.Llama")
     def test_load_local_gguf_uses_model_path(self, mock_llama, tmp_path):
         mock_llama.return_value = MagicMock()
         models = {"ingredient_extractor": "/models/finetuned.gguf"}

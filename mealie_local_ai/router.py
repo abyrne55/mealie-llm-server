@@ -24,7 +24,7 @@ class Router:
     def __init__(self, threshold: float = 0.6):
         self._threshold = threshold
         self._prompts: dict[str, set[str]] = {}
-        prompts_dir = files("mealie_llm_server.prompts")
+        prompts_dir = files("mealie_local_ai.prompts")
         for item in prompts_dir.iterdir():
             if hasattr(item, "name") and item.name.endswith(".txt"):
                 name = item.name.removesuffix(".txt")

@@ -8,13 +8,13 @@ from typing import TYPE_CHECKING, Any
 
 from llama_cpp import LlamaGrammar
 
-from mealie_llm_server.handlers.base import Handler
-from mealie_llm_server.models import ChatCompletionRequest, ChatCompletionResponse, build_chat_completion_response
+from mealie_local_ai.handlers.base import Handler
+from mealie_local_ai.models import ChatCompletionRequest, ChatCompletionResponse, build_chat_completion_response
 
 if TYPE_CHECKING:
     from llama_cpp import Llama
-    from mealie_llm_server.food_resolver import FoodResolver
-    from mealie_llm_server.mealie_client import MealieClient
+    from mealie_local_ai.food_resolver import FoodResolver
+    from mealie_local_ai.mealie_client import MealieClient
 
 logger = logging.getLogger(__name__)
 
@@ -121,7 +121,7 @@ class IngredientParsingHandler(Handler):
     model_key = "ingredient_extractor"
 
     def __init__(self, food_resolver: FoodResolver | None = None, model_id: str = ""):
-        self.reference_prompt = files("mealie_llm_server.prompts").joinpath("parse-recipe-ingredients.txt").read_text()
+        self.reference_prompt = files("mealie_local_ai.prompts").joinpath("parse-recipe-ingredients.txt").read_text()
         self._food_resolver = food_resolver
         self._model_id = model_id
 

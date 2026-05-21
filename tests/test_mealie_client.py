@@ -2,7 +2,7 @@ import time
 import pytest
 import httpx
 import respx
-from mealie_llm_server.mealie_client import MealieClient
+from mealie_local_ai.mealie_client import MealieClient
 
 
 FOODS_RESPONSE = {

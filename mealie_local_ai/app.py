@@ -5,15 +5,15 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, Request
 
-from mealie_llm_server.config import Settings
-from mealie_llm_server.food_resolver import FoodResolver
-from mealie_llm_server.handlers.base import Handler
-from mealie_llm_server.handlers.ingredient_parsing import IngredientParsingHandler
-from mealie_llm_server.mealie_client import MealieClient
-from mealie_llm_server.model_manager import ModelManager
-from mealie_llm_server.models import ChatCompletionRequest
-from mealie_llm_server.proxy import ProxyHandler
-from mealie_llm_server.router import Router
+from mealie_local_ai.config import Settings
+from mealie_local_ai.food_resolver import FoodResolver
+from mealie_local_ai.handlers.base import Handler
+from mealie_local_ai.handlers.ingredient_parsing import IngredientParsingHandler
+from mealie_local_ai.mealie_client import MealieClient
+from mealie_local_ai.model_manager import ModelManager
+from mealie_local_ai.models import ChatCompletionRequest
+from mealie_local_ai.proxy import ProxyHandler
+from mealie_local_ai.router import Router
 
 logger = logging.getLogger(__name__)
 

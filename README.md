@@ -1,4 +1,4 @@
-# mealie-llm-server
+# mealie-local-ai
 
 OpenAI-compatible API gateway for [Mealie](https://mealie.io/) that intercepts ingredient parsing requests and processes them locally using a fine-tuned [NuExtract-tiny-v1.5](https://huggingface.co/numind/NuExtract-tiny-v1.5) model with GBNF grammar-enforced JSON output and embedding-based food matching. All other requests are proxied to an upstream cloud API.
 
@@ -12,13 +12,13 @@ docker run -d \
   -e MEALIE_API_KEY=your-mealie-api-key \
   -e UPSTREAM_URL=https://api.openai.com/v1 \
   -e UPSTREAM_API_KEY=sk-... \
-  ghcr.io/abyrne/mealie-llm-server:main
+  ghcr.io/abyrne/mealie-local-ai:main
 ```
 
 Then point Mealie at this server:
 
 ```
-OPENAI_BASE_URL=http://mealie-llm-server:8000/v1
+OPENAI_BASE_URL=http://mealie-local-ai:8000/v1
 OPENAI_API_KEY=sk-dummy
 OPENAI_WORKERS=1
 OPENAI_REQUEST_TIMEOUT=300
@@ -29,7 +29,7 @@ OPENAI_REQUEST_TIMEOUT=300
 ## How It Works
 
 ```
-Mealie ──POST /v1/chat/completions──► mealie-llm-server
+Mealie ──POST /v1/chat/completions──► mealie-local-ai
                                           │
                                     ┌─────┴─────┐
                                     │   Router   │  (jaccard similarity
@@ -96,7 +96,7 @@ Set `MODEL_INGREDIENT_EXTRACTOR` to switch.
 ```bash
 uv sync
 uv run pytest -v
-uv run uvicorn mealie_llm_server.app:app --reload
+uv run uvicorn mealie_local_ai.app:app --reload
 ```
 
 ### Testing with a Live Mealie Instance

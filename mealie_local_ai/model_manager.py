@@ -7,7 +7,7 @@ from typing import AsyncIterator
 
 from llama_cpp import Llama
 
-from mealie_llm_server.config import Settings
+from mealie_local_ai.config import Settings
 
 logger = logging.getLogger(__name__)
 

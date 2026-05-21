@@ -7,9 +7,9 @@ from pathlib import Path
 import httpx
 import pytest
 
-from mealie_llm_server.config import Settings
-from mealie_llm_server.food_resolver import FoodResolver
-from mealie_llm_server.mealie_client import MealieClient
+from mealie_local_ai.config import Settings
+from mealie_local_ai.food_resolver import FoodResolver
+from mealie_local_ai.mealie_client import MealieClient
 
 
 def _load_env_file() -> None:

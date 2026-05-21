@@ -1,14 +1,14 @@
 import json
 import pytest
 from unittest.mock import AsyncMock, MagicMock, patch
-from mealie_llm_server.handlers.ingredient_parsing import (
+from mealie_local_ai.handlers.ingredient_parsing import (
     extract_ingredients,
     build_messages,
     null_unit_heuristic,
     resolve_unit,
     normalize_quantity,
 )
-from mealie_llm_server.models import ChatCompletionRequest
+from mealie_local_ai.models import ChatCompletionRequest
 
 
 class TestExtractIngredients:
@@ -168,7 +168,7 @@ class TestIngredientParsingHandler:
 
     @pytest.mark.asyncio
     async def test_handle_single_ingredient(self):
-        from mealie_llm_server.handlers.ingredient_parsing import IngredientParsingHandler
+        from mealie_local_ai.handlers.ingredient_parsing import IngredientParsingHandler
 
         handler = IngredientParsingHandler()
         mealie = self._make_mock_mealie()
@@ -182,7 +182,7 @@ class TestIngredientParsingHandler:
                 ],
             }
         )
-        with patch("mealie_llm_server.handlers.ingredient_parsing.LlamaGrammar"):
+        with patch("mealie_local_ai.handlers.ingredient_parsing.LlamaGrammar"):
             response = await handler.handle(request, model, mealie)
         result = json.loads(response.choices[0].message.content)
         assert len(result["ingredients"]) == 1
@@ -191,7 +191,7 @@ class TestIngredientParsingHandler:
 
     @pytest.mark.asyncio
     async def test_handle_batch_preserves_order(self):
-        from mealie_llm_server.handlers.ingredient_parsing import IngredientParsingHandler
+        from mealie_local_ai.handlers.ingredient_parsing import IngredientParsingHandler
 
         handler = IngredientParsingHandler()
         mealie = self._make_mock_mealie()
@@ -210,7 +210,7 @@ class TestIngredientParsingHandler:
                 ],
             }
         )
-        with patch("mealie_llm_server.handlers.ingredient_parsing.LlamaGrammar"):
+        with patch("mealie_local_ai.handlers.ingredient_parsing.LlamaGrammar"):
             response = await handler.handle(request, model, mealie)
         result = json.loads(response.choices[0].message.content)
         assert len(result["ingredients"]) == 2

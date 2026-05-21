@@ -7,7 +7,7 @@ from pathlib import Path
 import pytest
 from llama_cpp import LlamaGrammar
 
-from mealie_llm_server.handlers.ingredient_parsing import (
+from mealie_local_ai.handlers.ingredient_parsing import (
     _STRUCTURE_SCHEMA,
     build_messages,
     normalize_quantity,

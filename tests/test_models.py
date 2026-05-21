@@ -1,4 +1,4 @@
-from mealie_llm_server.models import (
+from mealie_local_ai.models import (
     ChatCompletionRequest,
     build_chat_completion_response,
 )

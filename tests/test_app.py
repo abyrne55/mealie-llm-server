@@ -19,7 +19,7 @@ def mock_settings(tmp_path):
 
 @pytest.fixture
 async def client(mock_settings):
-    from mealie_llm_server.app import app, lifespan
+    from mealie_local_ai.app import app, lifespan
 
     async with lifespan(app):
         transport = ASGITransport(app=app)

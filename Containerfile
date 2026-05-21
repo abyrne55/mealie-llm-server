@@ -27,7 +27,7 @@ RUN if [ "$TARGETPLATFORM" = "linux/amd64" ]; then \
     fi && \
     CMAKE_ARGS="$CMAKE_ARGS" uv sync --no-dev --frozen
 
-COPY mealie_llm_server ./mealie_llm_server
+COPY mealie_local_ai ./mealie_local_ai
 
 ###############################################
 # Stage 2: Runtime
@@ -40,7 +40,7 @@ ENV PYTHONUNBUFFERED=1 \
 WORKDIR /app
 
 COPY --from=builder --chown=65532:0 /build/.venv /app/.venv
-COPY --from=builder --chown=65532:0 /build/mealie_llm_server /app/mealie_llm_server
+COPY --from=builder --chown=65532:0 /build/mealie_local_ai /app/mealie_local_ai
 
 # libstdc++: needed by llama-cpp-python's bundled libllama.so
 COPY --from=builder /usr/lib64/libstdc++.so.6* /usr/lib64/
@@ -56,4 +56,4 @@ EXPOSE 8000
 HEALTHCHECK --interval=30s --timeout=5s --retries=3 --start-period=120s \
     CMD ["python3", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
 
-ENTRYPOINT ["python3", "-m", "uvicorn", "mealie_llm_server.app:app", "--host", "0.0.0.0", "--port", "8000"]
+ENTRYPOINT ["python3", "-m", "uvicorn", "mealie_local_ai.app:app", "--host", "0.0.0.0", "--port", "8000"]

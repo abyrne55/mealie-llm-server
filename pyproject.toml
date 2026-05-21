@@ -1,5 +1,5 @@
 [project]
-name = "mealie-llm-server"
+name = "mealie-local-ai"
 version = "0.1.0"
 description = "OpenAI-compatible API gateway for Mealie with local LLM inference"
 readme = "README.md"

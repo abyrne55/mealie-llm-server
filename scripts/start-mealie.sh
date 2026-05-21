@@ -115,7 +115,7 @@ seed() {
 
   echo "Creating long-lived API token..."
   TOKEN=$(api -X POST "$MEALIE_URL/api/users/api-tokens" \
-    -d '{"name": "mealie-llm-server-test"}' \
+    -d '{"name": "mealie-local-ai-test"}' \
     | jq -r '.token')
 
   local count

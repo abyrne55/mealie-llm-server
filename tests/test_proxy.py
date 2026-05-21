@@ -2,7 +2,7 @@ import json
 import pytest
 import httpx
 import respx
-from mealie_llm_server.proxy import ProxyHandler
+from mealie_local_ai.proxy import ProxyHandler
 
 
 @pytest.fixture

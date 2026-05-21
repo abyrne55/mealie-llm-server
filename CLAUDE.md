@@ -1,4 +1,4 @@
-# mealie-llm-server
+# mealie-local-ai
 
 OpenAI-compatible API gateway for Mealie that routes ingredient parsing to a local LLM with GBNF grammar-enforced JSON output and embedding-based food matching, and proxies all other requests to an upstream cloud API.
 
@@ -6,7 +6,7 @@ OpenAI-compatible API gateway for Mealie that routes ingredient parsing to a loc
 
 ```bash
 uv sync                                           # install deps
-uv run uvicorn mealie_llm_server.app:app --reload  # run locally
+uv run uvicorn mealie_local_ai.app:app --reload  # run locally
 uv run pytest -v                                   # run tests
 uv run ruff check .                                # lint
 ```
@@ -25,7 +25,7 @@ Cleanup: `podman stop mealie-test && podman rm mealie-test`
 ## Container Build
 
 ```bash
-podman build -t mealie-llm-server -f Containerfile .
+podman build -t mealie-local-ai -f Containerfile .
 ```
 
 ## Architecture
@@ -43,15 +43,15 @@ Request flow: `POST /v1/chat/completions` → Router (jaccard similarity on syst
 
 | File | Responsibility |
 |---|---|
-| `mealie_llm_server/app.py` | FastAPI app, lifespan, endpoints |
-| `mealie_llm_server/config.py` | Pydantic Settings with `_FILE` support |
-| `mealie_llm_server/models.py` | OpenAI request/response Pydantic models |
-| `mealie_llm_server/router.py` | Jaccard similarity prompt router |
-| `mealie_llm_server/handlers/ingredient_parsing.py` | NuExtract extraction + post-processing pipeline |
-| `mealie_llm_server/food_resolver.py` | Embedding-based food entity resolution |
-| `mealie_llm_server/mealie_client.py` | Mealie API client with TTL cache |
-| `mealie_llm_server/model_manager.py` | LLM loading/unloading |
-| `mealie_llm_server/proxy.py` | Upstream reverse proxy |
+| `mealie_local_ai/app.py` | FastAPI app, lifespan, endpoints |
+| `mealie_local_ai/config.py` | Pydantic Settings with `_FILE` support |
+| `mealie_local_ai/models.py` | OpenAI request/response Pydantic models |
+| `mealie_local_ai/router.py` | Jaccard similarity prompt router |
+| `mealie_local_ai/handlers/ingredient_parsing.py` | NuExtract extraction + post-processing pipeline |
+| `mealie_local_ai/food_resolver.py` | Embedding-based food entity resolution |
+| `mealie_local_ai/mealie_client.py` | Mealie API client with TTL cache |
+| `mealie_local_ai/model_manager.py` | LLM loading/unloading |
+| `mealie_local_ai/proxy.py` | Upstream reverse proxy |
 | `scripts/extract_training_data.py` | Extract JSONL training data from Mealie API + recipe pages |
 | `scripts/validate_jsonl.py` | Validate JSONL dataset format and constraints |
 
