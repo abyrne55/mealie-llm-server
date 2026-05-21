@@ -156,8 +156,25 @@ class IngredientParsingHandler(Handler):
             raw["food"] = heuristic["food"]
             raw["quantity"] = normalize_quantity(raw.get("quantity"))
 
+            extracted = dict(raw)
+
             if self._food_resolver and foods and raw["food"]:
-                raw["food"] = self._food_resolver.match(raw["food"], foods)
+                resolved_food, score, exact = self._food_resolver.match(raw["food"], foods)
+                raw["food"] = resolved_food
+                logger.debug(
+                    "Ingredient: %r | extracted: %s | resolved: %s | food_score: %.3f%s",
+                    ingredient_text,
+                    json.dumps(extracted),
+                    json.dumps(raw),
+                    score,
+                    " (exact)" if exact else "",
+                )
+            else:
+                logger.debug(
+                    "Ingredient: %r | extracted: %s | resolved: (skipped)",
+                    ingredient_text,
+                    json.dumps(extracted),
+                )
 
             results.append(raw)
 

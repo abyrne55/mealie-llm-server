@@ -35,20 +35,30 @@ class FoodResolver:
         self._food_embeddings = self._embed(foods)
         self._food_hash = h
 
-    def match(self, query: str, foods: list[str], threshold: float = _DEFAULT_THRESHOLD) -> str | None:
+    def match(
+        self, query: str, foods: list[str], threshold: float = _DEFAULT_THRESHOLD
+    ) -> tuple[str | None, float, bool]:
         if not query or not foods:
-            return None
+            return None, 0.0, False
         self._ensure_embeddings(foods)
 
         exact = self._food_names_lower.get(query.lower().strip())
         if exact is not None:
-            return exact
+            logger.debug("Food match: %r -> %r (exact)", query, exact)
+            return exact, 1.0, True
 
         query_vec = self._embed([query])
         similarities = (query_vec @ self._food_embeddings.T)[0]
         best_idx = int(np.argmax(similarities))
         best_score = float(similarities[best_idx])
-        logger.debug("Food match: %r -> %r (%.3f)", query, self._food_names[best_idx], best_score)
         if best_score >= threshold:
-            return self._food_names[best_idx]
-        return None
+            logger.debug("Food match: %r -> %r (%.3f)", query, self._food_names[best_idx], best_score)
+            return self._food_names[best_idx], best_score, False
+        logger.debug(
+            "Food match: %r -> no match (best: %r at %.3f, threshold: %.3f)",
+            query,
+            self._food_names[best_idx],
+            best_score,
+            threshold,
+        )
+        return None, best_score, False
