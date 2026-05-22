@@ -125,7 +125,3 @@ uv run python scripts/finetune.py        # CPU
 ```
 
 Or use `notebooks/finetune.ipynb` for GPU training on Google Colab (~2 min on T4).
-
-## License
-
-MIT
