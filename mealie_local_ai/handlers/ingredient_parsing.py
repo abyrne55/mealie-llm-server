@@ -151,32 +151,36 @@ class IngredientParsingHandler(Handler):
             )
             content = response["choices"][0]["message"]["content"]
             content = re.sub(r"[\x00-\x1f\x7f]", "", content)
-            raw = json.loads(content)
+            try:
+                raw = json.loads(content)
 
-            heuristic = null_unit_heuristic(ingredient_text, raw.get("unit"), raw.get("food"), unit_aliases)
-            raw["unit"] = resolve_unit(heuristic["unit"], unit_aliases)
-            raw["food"] = heuristic["food"]
-            raw["quantity"] = normalize_quantity(raw.get("quantity"))
+                heuristic = null_unit_heuristic(ingredient_text, raw.get("unit"), raw.get("food"), unit_aliases)
+                raw["unit"] = resolve_unit(heuristic["unit"], unit_aliases)
+                raw["food"] = heuristic["food"]
+                raw["quantity"] = normalize_quantity(raw.get("quantity"))
 
-            extracted = dict(raw)
+                extracted = dict(raw)
 
-            if self._food_resolver and foods and raw["food"]:
-                resolved_food, score, exact = self._food_resolver.match(raw["food"], foods)
-                raw["food"] = resolved_food
-                logger.debug(
-                    "Ingredient: %r | extracted: %s | resolved: %s | food_score: %.3f%s",
-                    ingredient_text,
-                    json.dumps(extracted),
-                    json.dumps(raw),
-                    score,
-                    " (exact)" if exact else "",
-                )
-            else:
-                logger.debug(
-                    "Ingredient: %r | extracted: %s | resolved: (skipped)",
-                    ingredient_text,
-                    json.dumps(extracted),
-                )
+                if self._food_resolver and foods and raw["food"]:
+                    resolved_food, score, exact = self._food_resolver.match(raw["food"], foods)
+                    raw["food"] = resolved_food
+                    logger.debug(
+                        "Ingredient: %r | extracted: %s | resolved: %s | food_score: %.3f%s",
+                        ingredient_text,
+                        json.dumps(extracted),
+                        json.dumps(raw),
+                        score,
+                        " (exact)" if exact else "",
+                    )
+                else:
+                    logger.debug(
+                        "Ingredient: %r | extracted: %s | resolved: (skipped)",
+                        ingredient_text,
+                        json.dumps(extracted),
+                    )
+            except Exception:
+                logger.warning("Failed to parse ingredient %r; returning blank", ingredient_text, exc_info=True)
+                raw = {"quantity": None, "unit": None, "food": "", "note": ingredient_text}
 
             results.append(raw)
 
