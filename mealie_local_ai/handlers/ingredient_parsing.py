@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import logging
+import re
 from fractions import Fraction
 from importlib.resources import files
 from typing import TYPE_CHECKING, Any
@@ -149,6 +150,7 @@ class IngredientParsingHandler(Handler):
                 max_tokens=-1,
             )
             content = response["choices"][0]["message"]["content"]
+            content = re.sub(r"[\x00-\x1f\x7f]", "", content)
             raw = json.loads(content)
 
             heuristic = null_unit_heuristic(ingredient_text, raw.get("unit"), raw.get("food"), unit_aliases)
