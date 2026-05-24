@@ -13,17 +13,17 @@ repos:
 
   - repo: local
     hooks:
-      - id: validate-jsonl
-        name: validate training JSONL
-        entry: python scripts/validate_jsonl.py
+      - id: validate-training-data
+        name: validate training data
+        entry: python scripts/validate_training_data.py
         language: python
-        files: \.jsonl$
+        files: ingredients\.csv$
 
       - id: sync-ingredients-md
         name: sync ingredients.md
-        entry: python scripts/jsonl_to_markdown.py tests/integration/ingredients.jsonl
+        entry: python scripts/training_data_to_markdown.py tests/integration/ingredients.csv
         language: python
-        files: ingredients\.(jsonl|md)$
+        files: ingredients\.(csv|md)$
         pass_filenames: false
 
   - repo: https://github.com/astral-sh/ruff-pre-commit

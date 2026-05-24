@@ -4,7 +4,7 @@ on:
   push:
     branches: [main]
     paths:
-      - tests/integration/ingredients.jsonl
+      - tests/integration/ingredients.csv
   workflow_dispatch:
 
 jobs:

@@ -118,7 +118,7 @@ podman stop mealie-test && podman rm mealie-test
 
 ### Fine-Tuning
 
-The extraction model can be fine-tuned on the ingredient dataset in `tests/integration/ingredients.jsonl` using LoRA:
+The extraction model can be fine-tuned on the ingredient dataset in `tests/integration/ingredients.csv` using LoRA:
 
 ```bash
 uv sync --group train
