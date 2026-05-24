@@ -19,19 +19,21 @@ import subprocess
 import sys
 from pathlib import Path
 
-import torch
-from datasets import Dataset
-from peft import LoraConfig, get_peft_model
-from transformers import AutoModelForCausalLM, AutoTokenizer
-from trl import SFTConfig, SFTTrainer
+PROJECT_ROOT = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(PROJECT_ROOT))
 
-from scripts.training_data import load_training_data, rows_to_dataset
+import torch  # noqa: E402
+from datasets import Dataset  # noqa: E402
+from peft import LoraConfig, get_peft_model  # noqa: E402
+from transformers import AutoModelForCausalLM, AutoTokenizer  # noqa: E402
+from trl import SFTConfig, SFTTrainer  # noqa: E402
+
+from scripts.training_data import load_training_data, rows_to_dataset  # noqa: E402
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
 logger = logging.getLogger(__name__)
 
 BASE_MODEL = "numind/NuExtract-1.5-tiny"
-PROJECT_ROOT = Path(__file__).resolve().parent.parent
 DATASET_PATH = PROJECT_ROOT / "tests" / "integration" / "ingredients.csv"
 TMP_DIR = PROJECT_ROOT / ".tmp"
 OUTPUT_DIR = TMP_DIR / "finetune-output"
