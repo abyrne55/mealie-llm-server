@@ -26,6 +26,8 @@ jobs:
         run: uv sync --group train
 
       - name: Fine-tune model
+        env:
+          OMP_NUM_THREADS: "4"
         run: uv run python scripts/finetune.py
 
       - name: Upload GGUF artifact
