@@ -53,7 +53,7 @@ async def lifespan(app: FastAPI):
         timeout=settings.UPSTREAM_TIMEOUT,
     )
 
-    food_resolver = FoodResolver(model_name=settings.MODEL_INGREDIENT_RESOLVER)
+    food_resolver = FoodResolver(model_name=settings.MODEL_INGREDIENT_RESOLVER, threshold=settings.RESOLVER_THRESHOLD)
     ingredient_handler = IngredientParsingHandler(
         food_resolver=food_resolver,
         model_id=settings.MODEL_INGREDIENT_EXTRACTOR,

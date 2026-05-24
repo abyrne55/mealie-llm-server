@@ -202,7 +202,6 @@ def main() -> None:
     stats = {
         "added": 0,
         "skipped_no_food": 0,
-        "skipped_not_seeded": 0,
         "skipped_no_text": 0,
         "skipped_duplicate": 0,
     }
@@ -231,9 +230,7 @@ def main() -> None:
 
             food_name = food["name"]
             if food_name.lower() not in seed_foods:
-                print(f"  skip (not seeded): {food_name}")
-                stats["skipped_not_seeded"] += 1
-                continue
+                print(f"  warning (not seeded): {food_name}", file=sys.stderr)
 
             ingredient_text = matches.get(i) or (ing.get("originalText") or "").strip()
             if not ingredient_text:
@@ -275,7 +272,6 @@ def main() -> None:
     print("\n--- Summary ---")
     print(f"Added:                {stats['added']}")
     print(f"Skipped (no food):    {stats['skipped_no_food']}")
-    print(f"Skipped (not seeded): {stats['skipped_not_seeded']}")
     print(f"Skipped (no text):    {stats['skipped_no_text']}")
     print(f"Skipped (duplicate):  {stats['skipped_duplicate']}")
     if args.dry_run:

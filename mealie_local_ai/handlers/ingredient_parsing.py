@@ -163,14 +163,16 @@ class IngredientParsingHandler(Handler):
 
                 if self._food_resolver and foods and raw["food"]:
                     resolved_food, score, exact = self._food_resolver.match(raw["food"], foods)
-                    raw["food"] = resolved_food
+                    if resolved_food is not None:
+                        raw["food"] = resolved_food
+                    suffix = " (exact)" if exact else " (fallback)" if resolved_food is None else ""
                     logger.debug(
                         "Ingredient: %r | extracted: %s | resolved: %s | food_score: %.3f%s",
                         ingredient_text,
                         json.dumps(extracted),
                         json.dumps(raw),
                         score,
-                        " (exact)" if exact else "",
+                        suffix,
                     )
                 else:
                     logger.debug(
