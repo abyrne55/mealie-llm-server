@@ -190,6 +190,58 @@ class TestIngredientParsingHandler:
         assert result["ingredients"][0]["unit"] == "cup"
 
     @pytest.mark.asyncio
+    async def test_handle_strips_control_chars(self):
+        from mealie_local_ai.handlers.ingredient_parsing import IngredientParsingHandler
+
+        handler = IngredientParsingHandler()
+        mealie = self._make_mock_mealie()
+        model = MagicMock()
+        raw_json = '{"quantity": 1, "unit": "cup", "food": "flour", "note": null}'
+        poisoned = raw_json[:10] + "\x13" + raw_json[10:]
+        model.create_chat_completion = MagicMock(return_value={"choices": [{"message": {"content": poisoned}}]})
+        request = ChatCompletionRequest.model_validate(
+            {
+                "model": "gpt-4o",
+                "messages": [
+                    {"role": "system", "content": "Parse ingredient strings."},
+                    {"role": "user", "content": '["1 cup flour"]'},
+                ],
+            }
+        )
+        with patch("mealie_local_ai.handlers.ingredient_parsing.LlamaGrammar"):
+            response = await handler.handle(request, model, mealie)
+        result = json.loads(response.choices[0].message.content)
+        assert result["ingredients"][0]["food"] == "flour"
+
+    @pytest.mark.asyncio
+    async def test_handle_returns_blank_on_unparseable_json(self):
+        from mealie_local_ai.handlers.ingredient_parsing import IngredientParsingHandler
+
+        handler = IngredientParsingHandler()
+        mealie = self._make_mock_mealie()
+        model = MagicMock()
+        model.create_chat_completion = MagicMock(
+            return_value={"choices": [{"message": {"content": "not json at all"}}]}
+        )
+        request = ChatCompletionRequest.model_validate(
+            {
+                "model": "gpt-4o",
+                "messages": [
+                    {"role": "system", "content": "Parse ingredient strings."},
+                    {"role": "user", "content": '["mystery ingredient"]'},
+                ],
+            }
+        )
+        with patch("mealie_local_ai.handlers.ingredient_parsing.LlamaGrammar"):
+            response = await handler.handle(request, model, mealie)
+        result = json.loads(response.choices[0].message.content)
+        ing = result["ingredients"][0]
+        assert ing["food"] == ""
+        assert ing["note"] == "mystery ingredient"
+        assert ing["quantity"] is None
+        assert ing["unit"] is None
+
+    @pytest.mark.asyncio
     async def test_handle_batch_preserves_order(self):
         from mealie_local_ai.handlers.ingredient_parsing import IngredientParsingHandler
 
