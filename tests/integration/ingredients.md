@@ -23,7 +23,7 @@
 |---|----------|-----|------|------|------|
 | 1 | 1 cup flour | 1 | cup | flour |  |
 | 2 | 2 tablespoons olive oil | 2 | tablespoons | olive oil |  |
-| 3 | 3 eggs | 3 |  | eggs |  |
+| 3 | 3 eggs | 3 |  | egg |  |
 | 4 | 1 1/2 cups chicken broth | 1.5 | cups | chicken broth |  |
 | 5 | 4 tbsp butter | 4 | tbsp | butter |  |
 | 6 | 2 tsp vanilla extract | 2 | tsp | vanilla extract |  |
@@ -84,7 +84,7 @@
 | 61 | 2 tablespoons soy sauce, divided | 2 | tablespoons | soy sauce | divided |
 | 62 | 4 garlic cloves, finely grated, divided | 4 | cloves | garlic | finely grated, divided |
 | 63 | 4 tablespoons vegetable oil, divided | 4 | tablespoons | vegetable oil | divided |
-| 64 | 2 14oz packages firm tofu, drained and gently squeezed to remove excess liquid | 2 | pack | extra firm tofu | drained and gently squeezed to remove excess liquid |
+| 64 | 2 14oz packages firm tofu, drained and gently squeezed to remove excess liquid | 2 | pack | firm tofu | drained and gently squeezed to remove excess liquid |
 | 65 | 2 teaspoons gochugaru (Korean red-pepper flakes) or 1 teaspoon crushed red pepper | 2 | teaspoons | gochugaru | or 1 tsp crushed red pepper |
 | 66 | 8 ounces bucatini or spaghetti | 8 | ounces | bucatini | or spaghetti |
 | 67 | Coarsely chopped cilantro leaves and tender stems, for serving |  |  | cilantro | leaves & stems coarsely chopped, for serving |
@@ -114,7 +114,7 @@
 | 91 | 1/2 cup/120 milliliters canola or grapeseed oil, plus more for the pan | 0.5 | cup | canola oil | or grapeseed oil, plus more for the pan |
 | 92 | 1 1/3 cups/170 grams all-purpose flour | 170 | grams | flour | (1⅓ cups) |
 | 93 | 1 1/2 cups/300 grams granulated sugar | 300 | grams | sugar | (1½ cups) |
-| 94 | 3/4 cup/75 grams Dutch-process cocoa powder | 0.75 | cup | cocoa | (¾ cup) Dutch-process preferred |
+| 94 | 3/4 cup/75 grams Dutch-process cocoa powder | 75 | grams | cocoa | (¾ cup) Dutch-process preferred |
 | 95 | 1 teaspoon baking powder | 1 | teaspoon | baking powder |  |
 | 96 | 1 teaspoon baking soda | 1 | teaspoon | baking soda |  |
 | 97 | 2/3 cup/150 grams sour cream | 150 | grams | sour cream | (⅔ cup) |
@@ -130,7 +130,7 @@
 | 107 | 1 1/2 cups/360 milliliters heavy cream | 1.5 | cups | heavy cream | (360 ml) |
 | 108 | 8 ounces/225 grams bittersweet chocolate chips | 225 | grams | chocolate | (8 oz) bittersweet preferred |
 | 109 | 2 tablespoons extra-virgin olive oil | 2 | tablespoons | extra virgin olive oil |  |
-| 110 | 2 garlic cloves, minced or puréed | 2 | cloves | garlic | minced or puréeed |
+| 110 | 2 garlic cloves, minced or puréed | 2 | cloves | garlic | minced or puréed |
 | 111 | 1 teaspoon chopped fresh rosemary | 1 | teaspoon | rosemary | chopped, fresh |
 | 112 | 2 boneless skinless chicken breasts | 2 |  | chicken breast | boneless, skinless |
 | 113 | 1/4 cup dry white wine | 0.25 | cup | white wine | dry |

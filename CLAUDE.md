@@ -111,6 +111,6 @@ Set `MODEL_INGREDIENT_EXTRACTOR` to switch.
 
 | Model | ID | Speed | Notes |
 |---|---|---|---|
-| **NuExtract-tiny-v1.5 fine-tuned** (default) | `abyrne55/nuextract-1.5-tiny-mealie-ingredient-parser:q8_0` | ~1.8s/ingredient | ~0.5GB, LoRA fine-tuned on 162-example ingredient dataset (shuffled), 93% training / 97% novel ingredient pass rate |
+| **NuExtract-tiny-v1.5 fine-tuned** (default) | `abyrne55/nuextract-1.5-tiny-mealie-ingredient-parser:q8_0` | ~1.8s/ingredient | ~0.5GB, LoRA fine-tuned on 167-example ingredient dataset (shuffled), 93% training / 97% novel ingredient pass rate |
 | NuExtract-tiny-v1.5 (base) | `DevQuasar-3/numind.NuExtract-tiny-v1.5-GGUF:Q6_K` | ~1.8s/ingredient | ~0.5GB, base model without fine-tuning, 49% test pass rate |
 | NuExtract-v1.5 | `DevQuasar-3/numind.NuExtract-v1.5-GGUF:Q6_K` | ~3s/ingredient | ~1.5GB, larger base model |
