@@ -1,4 +1,4 @@
-# Training Dataset (162 entries)
+# Training Dataset (167 entries)
 
 ## Prompt
 
@@ -183,3 +183,8 @@
 | 160 | 1 ¾ cups soy sauce | 1.75 | cups | soy sauce |  |
 | 161 | 2⅜ tsp baking powder | 2.375 | tsp | baking powder |  |
 | 162 | 1⅝ oz cream cheese | 1.625 | oz | cream cheese |  |
+| 163 | ½ tablespoon onion powder | 0.5 | tablespoon | onion powder |  |
+| 164 | 2 boneless, skinless chicken breasts, about 1 ½ to 2 pounds (see Tip) | 2 |  | chicken breast | (1½-2 lb) boneless, skinless |
+| 165 | 1 ¼ pounds rhubarb, trimmed and cut into 1-inch pieces (about 4 cups) | 1.25 | pound | rhubarb | trimmed and cut into 1-inch pieces |
+| 166 | ½ to ⅔ cup sugar | 0.5 | cup | sugar | up to ⅔ cup |
+| 167 | 1 vanilla bean, halved lengthwise; 1 teaspoon cardamom pods; or 1 (1-inch) piece fresh ginger, sliced into coins, for flavoring (optional) | 1 |  | vanilla bean | halved lengthwise, or 1 tsp cardamom pods, or 1 inch of sliced ginger (optional) |
