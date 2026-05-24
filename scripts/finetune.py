@@ -13,7 +13,6 @@ Usage:
 from __future__ import annotations
 
 import argparse
-import json
 import logging
 import platform
 import subprocess
@@ -26,8 +25,7 @@ from peft import LoraConfig, get_peft_model
 from transformers import AutoModelForCausalLM, AutoTokenizer
 from trl import SFTConfig, SFTTrainer
 
-from mealie_local_ai.handlers.ingredient_parsing import build_messages
-from scripts.training_data import load_training_data
+from scripts.training_data import load_training_data, rows_to_dataset
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
 logger = logging.getLogger(__name__)
@@ -60,13 +58,7 @@ def parse_args() -> argparse.Namespace:
 
 
 def load_dataset_from_csv(path: Path) -> Dataset:
-    records = []
-    for ingredient_text, qty, unit, food, note in load_training_data(path):
-        messages = build_messages(ingredient_text)
-        output = {"quantity": qty, "unit": unit, "food": food, "note": note}
-        messages.append({"role": "assistant", "content": json.dumps(output)})
-        records.append({"messages": messages})
-    return Dataset.from_list(records)
+    return Dataset.from_list(rows_to_dataset(load_training_data(path)))
 
 
 def format_chat(example: dict, tokenizer: AutoTokenizer) -> dict:
