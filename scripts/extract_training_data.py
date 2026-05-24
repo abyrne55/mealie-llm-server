@@ -14,6 +14,7 @@ Requires MEALIE_URL and MEALIE_API_KEY environment variables (or .env.test).
 from __future__ import annotations
 
 import argparse
+import csv
 import json
 import os
 import re
@@ -26,12 +27,12 @@ from pathlib import Path
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(PROJECT_ROOT))
 
-from mealie_local_ai.handlers.ingredient_parsing import build_messages  # noqa: E402
+from scripts.training_data import load_training_data  # noqa: E402
 
 SEED_FOODS_PATH = (
     PROJECT_ROOT / ".." / "mealie" / "mealie" / "repos" / "seed" / "resources" / "foods" / "locales" / "en-US.json"
 )
-JSONL_PATH = PROJECT_ROOT / "tests" / "integration" / "ingredients.jsonl"
+DATASET_PATH = PROJECT_ROOT / "tests" / "integration" / "ingredients.csv"
 ENV_FILE = PROJECT_ROOT / ".env.test"
 
 
@@ -154,17 +155,9 @@ def clean_quantity(q: float | None) -> int | float | None:
 
 
 def load_existing_ingredients(path: Path) -> set[str]:
-    texts: set[str] = set()
     if not path.exists():
-        return texts
-    with open(path) as f:
-        for line in f:
-            entry = json.loads(line)
-            content = entry["messages"][0]["content"]
-            m = re.search(r"### Text:\n(.+?)\n\n<\|output\|>", content, re.DOTALL)
-            if m:
-                texts.add(m.group(1).strip().lower())
-    return texts
+        return set()
+    return {row[0].strip().lower() for row in load_training_data(path)}
 
 
 def main() -> None:
@@ -174,7 +167,7 @@ def main() -> None:
         "--mealie-api-key", default=None, help="Mealie API key (default: MEALIE_API_KEY env var or .env.test)"
     )
     parser.add_argument("--seed-foods", default=str(SEED_FOODS_PATH), help="Path to en-US.json seed foods")
-    parser.add_argument("--output", default=str(JSONL_PATH), help="Path to output JSONL")
+    parser.add_argument("--output", default=str(DATASET_PATH), help="Path to output CSV")
     parser.add_argument("--dry-run", action="store_true", help="Print entries without writing")
     args = parser.parse_args()
 
@@ -198,7 +191,7 @@ def main() -> None:
     existing = load_existing_ingredients(output_path)
     print(f"Found {len(existing)} existing entries in {output_path.name}")
 
-    new_entries: list[str] = []
+    new_entries: list[tuple] = []
     stats = {
         "added": 0,
         "skipped_no_food": 0,
@@ -247,17 +240,15 @@ def main() -> None:
             else:
                 unit_str = ""
 
-            messages = build_messages(ingredient_text)
-            output = {
-                "quantity": clean_quantity(ing.get("quantity")),
-                "unit": unit_str,
-                "food": food_name,
-                "note": ing.get("note") or "",
-            }
-            messages.append({"role": "assistant", "content": json.dumps(output)})
-            entry = json.dumps({"messages": messages})
+            output = (
+                ingredient_text,
+                "" if clean_quantity(ing.get("quantity")) is None else clean_quantity(ing.get("quantity")),
+                unit_str,
+                food_name,
+                ing.get("note") or "",
+            )
 
-            new_entries.append(entry)
+            new_entries.append(output)
             existing.add(ingredient_text.strip().lower())
             stats["added"] += 1
             print(f"  + {ingredient_text[:70]}")
@@ -265,9 +256,12 @@ def main() -> None:
         time.sleep(0.5)
 
     if new_entries and not args.dry_run:
-        with open(output_path, "a") as f:
-            for entry in new_entries:
-                f.write(entry + "\n")
+        file_exists = output_path.exists()
+        with open(output_path, "a", newline="") as f:
+            writer = csv.writer(f)
+            if not file_exists:
+                writer.writerow(["ingredient_text", "quantity", "unit", "food", "note"])
+            writer.writerows(new_entries)
 
     print("\n--- Summary ---")
     print(f"Added:                {stats['added']}")
