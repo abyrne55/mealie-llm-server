@@ -56,7 +56,7 @@ Mealie ──POST /v1/chat/completions──► mealie-local-ai
 Ingredient parsing requests are identified by matching the system prompt against known Mealie prompts. Matched requests go through a two-step pipeline:
 
 1. **Extract** — A fine-tuned NuExtract-tiny-v1.5 model extracts quantity, unit, food, and note from the ingredient text, with GBNF grammar enforcing valid JSON output.
-2. **Resolve** — Extracted food strings are matched to your Mealie database using [model2vec](https://github.com/MinishLab/model2vec) static embeddings (exact match first, then cosine similarity).
+2. **Resolve** — Extracted food strings are matched to your Mealie database using [model2vec](https://github.com/MinishLab/model2vec) static embeddings (exact match first, then cosine similarity). When no match exceeds the similarity threshold, the raw LLM-extracted food string is preserved as a fallback.
 
 Everything else passes through to the upstream API.
 
@@ -78,6 +78,7 @@ All environment variables support `_FILE` variants for container secrets (e.g. `
 | `MODEL_CONTEXT_SIZE` | No | `4096` | LLM context window size |
 | `MODEL_THREADS` | No | auto | Number of CPU threads for inference |
 | `MODEL_CACHE_DIR` | No | `/models` | Directory for downloaded models |
+| `RESOLVER_THRESHOLD` | No | `0.65` | Cosine similarity threshold for food resolution (below this, raw extracted food is kept) |
 | `ROUTER_THRESHOLD` | No | `0.6` | Jaccard similarity threshold for prompt matching |
 | `LOG_LEVEL` | No | `info` | Logging level |
 

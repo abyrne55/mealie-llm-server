@@ -11,9 +11,10 @@ _DEFAULT_THRESHOLD = 0.65
 
 
 class FoodResolver:
-    def __init__(self, model_name: str, cache_dir: str | None = None):
+    def __init__(self, model_name: str, cache_dir: str | None = None, threshold: float = _DEFAULT_THRESHOLD):
         logger.info("Loading embedding model %s", model_name)
         self._model = StaticModel.from_pretrained(model_name)
+        self._threshold = threshold
         self._food_names: list[str] = []
         self._food_names_lower: dict[str, str] = {}
         self._food_embeddings: np.ndarray | None = None
@@ -35,9 +36,9 @@ class FoodResolver:
         self._food_embeddings = self._embed(foods)
         self._food_hash = h
 
-    def match(
-        self, query: str, foods: list[str], threshold: float = _DEFAULT_THRESHOLD
-    ) -> tuple[str | None, float, bool]:
+    def match(self, query: str, foods: list[str], threshold: float | None = None) -> tuple[str | None, float, bool]:
+        if threshold is None:
+            threshold = self._threshold
         if not query or not foods:
             return None, 0.0, False
         self._ensure_embeddings(foods)

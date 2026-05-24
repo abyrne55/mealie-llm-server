@@ -22,6 +22,7 @@ _FILE_FIELDS = [
     "MODEL_CONTEXT_SIZE",
     "MODEL_THREADS",
     "MODEL_CACHE_DIR",
+    "RESOLVER_THRESHOLD",
     "ROUTER_THRESHOLD",
     "LOG_LEVEL",
 ]
@@ -44,6 +45,7 @@ class Settings(BaseSettings):
     MODEL_THREADS: int | None = None
     MODEL_CACHE_DIR: str = "/models"
 
+    RESOLVER_THRESHOLD: float = 0.65
     ROUTER_THRESHOLD: float = 0.6
     LOG_LEVEL: str = "info"
 
@@ -60,6 +62,7 @@ class Settings(BaseSettings):
     MODEL_CONTEXT_SIZE_FILE: str | None = None
     MODEL_THREADS_FILE: str | None = None
     MODEL_CACHE_DIR_FILE: str | None = None
+    RESOLVER_THRESHOLD_FILE: str | None = None
     ROUTER_THRESHOLD_FILE: str | None = None
     LOG_LEVEL_FILE: str | None = None
 

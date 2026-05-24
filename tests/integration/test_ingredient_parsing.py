@@ -98,7 +98,9 @@ def parse_ingredient(
     raw["quantity"] = normalize_quantity(raw.get("quantity"))
 
     if food_resolver and foods and raw["food"]:
-        raw["food"], _, _ = food_resolver.match(raw["food"], foods)
+        resolved_food, _, _ = food_resolver.match(raw["food"], foods)
+        if resolved_food is not None:
+            raw["food"] = resolved_food
 
     return raw
 

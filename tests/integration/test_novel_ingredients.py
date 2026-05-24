@@ -345,7 +345,9 @@ def _parse(ingredient_text, llm_model, food_resolver, foods, unit_aliases):
     raw["quantity"] = normalize_quantity(raw.get("quantity"))
 
     if food_resolver and foods and raw["food"]:
-        raw["food"], _, _ = food_resolver.match(raw["food"], foods)
+        resolved_food, _, _ = food_resolver.match(raw["food"], foods)
+        if resolved_food is not None:
+            raw["food"] = resolved_food
 
     return raw
 

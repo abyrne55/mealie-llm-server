@@ -34,7 +34,7 @@ Request flow: `POST /v1/chat/completions` → Router (jaccard similarity on syst
 
 - **Router** (`router.py`): Matches incoming system prompts against reference Mealie prompts using jaccard similarity.
 - **Handlers** (`handlers/`): Process matched requests locally using llama-cpp-python. `IngredientParsingHandler` extracts ingredients via LLM with GBNF JSON schema enforcement, then resolves foods against the Mealie database using embedding similarity.
-- **Food Resolver** (`food_resolver.py`): Resolves extracted food strings to Mealie database entries using model2vec static embeddings (exact match first, then cosine similarity).
+- **Food Resolver** (`food_resolver.py`): Resolves extracted food strings to Mealie database entries using model2vec static embeddings (exact match first, then cosine similarity). Falls back to the raw LLM-extracted food string when no match exceeds the similarity threshold.
 - **Proxy** (`proxy.py`): Forwards unmatched/multimodal requests to an upstream OpenAI-compatible API.
 - **Model Manager** (`model_manager.py`): Loads/unloads GGUF models with `all` (preload) or `swap` (on-demand) strategies.
 - **Mealie Client** (`mealie_client.py`): Fetches foods/units from Mealie with TTL cache for enum constraints.
@@ -73,6 +73,7 @@ All env vars support `_FILE` variants for container secrets (e.g. `MEALIE_API_KE
 | `MODEL_CONTEXT_SIZE` | No | `4096` | Context window size |
 | `MODEL_THREADS` | No | auto | CPU threads for inference |
 | `MODEL_CACHE_DIR` | No | `/models` | Model download directory |
+| `RESOLVER_THRESHOLD` | No | `0.65` | Cosine similarity threshold for food resolution (below this, raw extracted food is kept) |
 | `ROUTER_THRESHOLD` | No | `0.6` | Jaccard similarity threshold |
 | `LOG_LEVEL` | No | `info` | Logging level |
 
@@ -93,7 +94,7 @@ uv run python scripts/extract_training_data.py --dry-run     # preview without w
 uv run python scripts/validate_jsonl.py tests/integration/ingredients.jsonl  # validate
 ```
 
-The script fetches all recipes from Mealie, scrapes the original recipe pages for raw ingredient text, filters to foods in the default en-US seed database (from `../mealie`), and appends new deduplicated entries to the JSONL. Requires `MEALIE_URL` and `MEALIE_API_KEY` (from env, `.env.test`, or `--mealie-url`/`--mealie-api-key` flags).
+The script fetches all recipes from Mealie, scrapes the original recipe pages for raw ingredient text, and appends new deduplicated entries to the JSONL. Foods not in the en-US seed database are included with a warning. Requires `MEALIE_URL` and `MEALIE_API_KEY` (from env, `.env.test`, or `--mealie-url`/`--mealie-api-key` flags).
 
 **When adding or editing entries manually, all of the following must hold:**
 
@@ -101,9 +102,8 @@ The script fetches all recipes from Mealie, scrapes the original recipe pages fo
 2. **Key casing**: All keys lowercase — `quantity`, `unit`, `food`, `note`.
 3. **Empty values**: Use `""` (empty string) for absent unit/note, not `null`.
 4. **Prompt generation**: Always use `build_messages()` from `handlers/ingredient_parsing.py` to generate the user message. Do not hand-write the NuExtract template.
-5. **Food values must be exact Mealie DB entries**: Every `food` value must exist verbatim (case-insensitive) in the Mealie test instance seeded by `scripts/start-mealie.sh`. Query the API (`/api/foods?search=<term>`) to verify. If the ingredient text uses a synonym or variant not in the DB, map `food` to the correct DB entry and capture the original qualifier in `note` (e.g., "arborio rice" → `food: "risotto rice"`, `note: "arborio"`).
+5. **Food values should match Mealie DB entries when possible**: Prefer foods that exist verbatim (case-insensitive) in the Mealie test instance seeded by `scripts/start-mealie.sh`. Query the API (`/api/foods?search=<term>`) to verify. If the ingredient text uses a synonym or variant not in the DB, map `food` to the correct DB entry and capture the original qualifier in `note` (e.g., "arborio rice" → `food: "risotto rice"`, `note: "arborio"`). Novel foods not in the DB are acceptable — use the raw ingredient text as the food value.
 6. **Unit values must be known aliases**: Every non-empty `unit` value must appear in the Mealie unit alias map (canonical name, plural, or abbreviation). Check via `/api/units?per_page=-1`.
-7. **No unresolvable foods**: If an ingredient's food cannot be matched to any DB entry, do not include it in the dataset.
 
 ## Supported Extraction Models
 
