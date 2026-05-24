@@ -153,8 +153,6 @@ def convert_to_gguf(merged_path: Path, gguf_output: Path) -> Path:
     if not convert_script.exists():
         raise FileNotFoundError(f"convert_hf_to_gguf.py not found at {convert_script}")
 
-    subprocess.run(["uv", "pip", "install", "gguf", "sentencepiece", "protobuf"], check=True)
-
     gguf_output.parent.mkdir(parents=True, exist_ok=True)
 
     logger.info("Converting to GGUF (q8_0)...")

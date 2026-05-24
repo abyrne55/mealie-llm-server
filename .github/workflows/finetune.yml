@@ -1,0 +1,37 @@
+name: Fine-tune
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - tests/integration/ingredients.jsonl
+  workflow_dispatch:
+
+jobs:
+  finetune:
+    runs-on: ubuntu-24.04-arm
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+
+      - name: Install dependencies
+        run: uv sync --group train
+
+      - name: Fine-tune model
+        run: uv run python scripts/finetune.py
+
+      - name: Upload GGUF artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: nuextract-1.5-tiny-finetuned-gguf
+          path: models/nuextract-1.5-tiny-finetuned-q8_0.gguf
+          retention-days: 90
+          if-no-files-found: error

@@ -1,0 +1,77 @@
+name: Publish model
+
+on:
+  workflow_dispatch:
+    inputs:
+      run_id:
+        description: >-
+          Fine-tune workflow run ID to pull the GGUF from.
+          Leave blank to use the latest successful run.
+        required: false
+        type: string
+
+env:
+  ARTIFACT_NAME: nuextract-1.5-tiny-finetuned-gguf
+  HF_REPO: abyrne55/nuextract-1.5-tiny-mealie-ingredient-parser
+  GGUF_FILE: nuextract-1.5-tiny-finetuned-q8_0.gguf
+
+jobs:
+  publish:
+    runs-on: ubuntu-24.04-arm
+    permissions:
+      contents: read
+      actions: read
+
+    steps:
+      - name: Resolve fine-tune run ID
+        id: resolve
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if [[ -n "${{ inputs.run_id }}" ]]; then
+            echo "run_id=${{ inputs.run_id }}" >> "$GITHUB_OUTPUT"
+          else
+            run_id=$(gh run list \
+              --repo "${{ github.repository }}" \
+              --workflow "Fine-tune" \
+              --status success \
+              --limit 1 \
+              --json databaseId \
+              --jq '.[0].databaseId')
+            if [[ -z "$run_id" || "$run_id" == "null" ]]; then
+              echo "::error::No successful Fine-tune workflow run found"
+              exit 1
+            fi
+            echo "run_id=$run_id" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Checkout repository
+        uses: actions/checkout@v6
+        with:
+          sparse-checkout: |
+            pyproject.toml
+            uv.lock
+          sparse-checkout-cone-mode: false
+
+      - name: Download GGUF artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ env.ARTIFACT_NAME }}
+          run-id: ${{ steps.resolve.outputs.run_id }}
+          github-token: ${{ github.token }}
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+
+      - name: Install huggingface-hub
+        run: uv sync --no-dev --no-install-project
+
+      - name: Upload GGUF to HuggingFace Hub
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+        run: |
+          uv run huggingface-cli upload "$HF_REPO" \
+            "$GGUF_FILE" "$GGUF_FILE" \
+            --commit-message "Update fine-tuned GGUF from workflow run ${{ steps.resolve.outputs.run_id }}"
