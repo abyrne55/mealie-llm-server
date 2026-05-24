@@ -13,27 +13,27 @@ Usage:
 from __future__ import annotations
 
 import argparse
-import json
 import logging
 import platform
 import subprocess
 import sys
 from pathlib import Path
 
-import torch
-from datasets import Dataset
-from peft import LoraConfig, get_peft_model
-from transformers import AutoModelForCausalLM, AutoTokenizer
-from trl import SFTConfig, SFTTrainer
+PROJECT_ROOT = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(PROJECT_ROOT))
 
-from mealie_local_ai.handlers.ingredient_parsing import build_messages
-from scripts.training_data import load_training_data
+import torch  # noqa: E402
+from datasets import Dataset  # noqa: E402
+from peft import LoraConfig, get_peft_model  # noqa: E402
+from transformers import AutoModelForCausalLM, AutoTokenizer  # noqa: E402
+from trl import SFTConfig, SFTTrainer  # noqa: E402
+
+from scripts.training_data import load_training_data, rows_to_dataset  # noqa: E402
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
 logger = logging.getLogger(__name__)
 
 BASE_MODEL = "numind/NuExtract-1.5-tiny"
-PROJECT_ROOT = Path(__file__).resolve().parent.parent
 DATASET_PATH = PROJECT_ROOT / "tests" / "integration" / "ingredients.csv"
 TMP_DIR = PROJECT_ROOT / ".tmp"
 OUTPUT_DIR = TMP_DIR / "finetune-output"
@@ -60,13 +60,7 @@ def parse_args() -> argparse.Namespace:
 
 
 def load_dataset_from_csv(path: Path) -> Dataset:
-    records = []
-    for ingredient_text, qty, unit, food, note in load_training_data(path):
-        messages = build_messages(ingredient_text)
-        output = {"quantity": qty, "unit": unit, "food": food, "note": note}
-        messages.append({"role": "assistant", "content": json.dumps(output)})
-        records.append({"messages": messages})
-    return Dataset.from_list(records)
+    return Dataset.from_list(rows_to_dataset(load_training_data(path)))
 
 
 def format_chat(example: dict, tokenizer: AutoTokenizer) -> dict:
