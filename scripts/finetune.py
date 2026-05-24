@@ -116,6 +116,7 @@ def train(args: argparse.Namespace) -> Path:
         save_strategy="epoch",
         bf16=use_bf16,
         fp16=False,
+        use_cpu=not torch.cuda.is_available(),
         dataloader_pin_memory=torch.cuda.is_available(),
         optim="adamw_torch",
         report_to="none",
