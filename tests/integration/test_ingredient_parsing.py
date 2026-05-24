@@ -14,10 +14,9 @@ from mealie_local_ai.handlers.ingredient_parsing import (
     null_unit_heuristic,
     resolve_unit,
 )
+from scripts.training_data import load_training_data
 
-_JSONL_PATH = Path(__file__).parent / "ingredients.jsonl"
-
-_TEXT_RE = re.compile(r"### Text:\n(.+?)\n\n<\|output\|>", re.DOTALL)
+_CSV_PATH = Path(__file__).parent / "ingredients.csv"
 
 _XFAIL_REGISTRY: dict[str, str] = {
     "1 cup chickpea cooking liquid": "resolver doesn't map 'chickpea cooking liquid' to 'aquafaba'",
@@ -31,27 +30,16 @@ _FOOD_ALIASES: dict[str, set[str]] = {
 }
 
 
-def _load_jsonl() -> list[tuple[str, float | None, str, str, str]]:
+def _load_csv() -> list[tuple[str, float | None, str, str, str]]:
     entries = []
-    for line in _JSONL_PATH.read_text().splitlines():
-        row = json.loads(line)
-        user_content = row["messages"][0]["content"]
-        m = _TEXT_RE.search(user_content)
-        if not m:
-            continue
-        ingredient_text = m.group(1).strip()
-        expected = json.loads(row["messages"][1]["content"])
-        exp_qty = normalize_quantity(expected.get("quantity"))
-        exp_raw_unit = expected.get("unit", "")
-        exp_food = expected.get("food", "")
-        exp_note = expected.get("note", "")
-        entries.append((ingredient_text, exp_qty, exp_raw_unit, exp_food, exp_note))
+    for ingredient_text, qty, unit, food, note in load_training_data(_CSV_PATH):
+        entries.append((ingredient_text, normalize_quantity(qty), unit, food, note))
     return entries
 
 
 def _build_params():
     params = []
-    for entry in _load_jsonl():
+    for entry in _load_csv():
         ingredient_text = entry[0]
         marks = ()
         if ingredient_text in _XFAIL_REGISTRY:
@@ -60,7 +48,7 @@ def _build_params():
     return params
 
 
-JSONL_CASES = _build_params()
+DATASET_CASES = _build_params()
 
 
 def _ngram_jaccard(a: str, b: str, n: int = 3) -> float:
@@ -105,7 +93,7 @@ def parse_ingredient(
     return raw
 
 
-@pytest.mark.parametrize("ingredient, exp_qty, exp_raw_unit, exp_food, exp_note", JSONL_CASES)
+@pytest.mark.parametrize("ingredient, exp_qty, exp_raw_unit, exp_food, exp_note", DATASET_CASES)
 def test_ingredient_parsing(
     ingredient, exp_qty, exp_raw_unit, exp_food, exp_note, llm_model, food_resolver, foods, unit_aliases
 ):
