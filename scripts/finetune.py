@@ -105,6 +105,7 @@ def train(args: argparse.Namespace) -> Path:
         learning_rate=args.lr,
         warmup_ratio=args.warmup_ratio,
         weight_decay=args.weight_decay,
+        use_cpu=not torch.cuda.is_available(),
         logging_steps=1,
         save_strategy="epoch",
         optim="adamw_torch",
