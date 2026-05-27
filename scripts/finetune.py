@@ -14,7 +14,6 @@ from __future__ import annotations
 
 import argparse
 import logging
-import platform
 import subprocess
 import sys
 from pathlib import Path
@@ -74,14 +73,8 @@ def train(args: argparse.Namespace) -> Path:
     if tokenizer.pad_token is None:
         tokenizer.pad_token = tokenizer.eos_token
 
-    # Graviton3+ (aarch64) and CUDA GPUs support native BF16
-    use_bf16 = torch.cuda.is_available() or platform.machine() == "aarch64"
-    dtype = torch.bfloat16 if use_bf16 else torch.float32
-    logger.info("Using dtype: %s", dtype)
-
     model = AutoModelForCausalLM.from_pretrained(
         BASE_MODEL,
-        dtype=dtype,
         device_map="auto" if torch.cuda.is_available() else None,
     )
 
@@ -114,10 +107,6 @@ def train(args: argparse.Namespace) -> Path:
         weight_decay=args.weight_decay,
         logging_steps=1,
         save_strategy="epoch",
-        bf16=use_bf16,
-        fp16=False,
-        use_cpu=not torch.cuda.is_available(),
-        dataloader_pin_memory=torch.cuda.is_available(),
         optim="adamw_torch",
         report_to="none",
         max_grad_norm=1.0,
