@@ -50,7 +50,13 @@ def llm_model():
     )
     try:
         if Settings.is_local_gguf(model_id):
-            model = Llama(model_path=model_id, n_ctx=4096, verbose=False)
+            model = Llama(
+                model_path=model_id,
+                n_ctx=512,
+                n_gpu_layers=-1,
+                flash_attn=True,
+                verbose=False,
+            )
         else:
             repo_id, filename = Settings.parse_model_id(model_id)
             cache_dir = os.environ.get(
@@ -60,7 +66,9 @@ def llm_model():
             model = Llama.from_pretrained(
                 repo_id=repo_id,
                 filename=filename,
-                n_ctx=4096,
+                n_ctx=512,
+                n_gpu_layers=-1,
+                flash_attn=True,
                 verbose=False,
                 cache_dir=cache_dir,
             )
