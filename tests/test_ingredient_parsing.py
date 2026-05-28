@@ -150,7 +150,7 @@ class TestNormalizeQuantity:
 class TestIngredientParsingHandler:
     def _make_mock_mealie(self):
         mealie = AsyncMock()
-        mealie.get_foods.return_value = ["flour", "egg", "olive oil"]
+        mealie.get_foods.return_value = ["flour", "egg", "eggs", "olive oil"]
         mealie.get_units.return_value = ["cup", "tablespoon", "teaspoon"]
         mealie.get_unit_aliases.return_value = {
             "cup": ["cup", "cups"],
@@ -167,12 +167,12 @@ class TestIngredientParsingHandler:
         return model
 
     @pytest.mark.asyncio
-    async def test_handle_single_ingredient(self):
+    async def test_handle_regex_match_skips_llm(self):
         from mealie_local_ai.handlers.ingredient_parsing import IngredientParsingHandler
 
         handler = IngredientParsingHandler()
         mealie = self._make_mock_mealie()
-        model = self._make_mock_model([{"quantity": 1, "unit": "cup", "food": "flour", "note": None}])
+        model = self._make_mock_model([])
         request = ChatCompletionRequest.model_validate(
             {
                 "model": "gpt-4o",
@@ -188,6 +188,7 @@ class TestIngredientParsingHandler:
         assert len(result["ingredients"]) == 1
         assert result["ingredients"][0]["food"] == "flour"
         assert result["ingredients"][0]["unit"] == "cup"
+        assert model.create_chat_completion.call_count == 0
 
     @pytest.mark.asyncio
     async def test_handle_strips_control_chars(self):
@@ -196,7 +197,7 @@ class TestIngredientParsingHandler:
         handler = IngredientParsingHandler()
         mealie = self._make_mock_mealie()
         model = MagicMock()
-        raw_json = '{"quantity": 1, "unit": "cup", "food": "flour", "note": null}'
+        raw_json = '{"quantity": 1, "unit": "cup", "food": "sugar", "note": null}'
         poisoned = raw_json[:10] + "\x13" + raw_json[10:]
         model.create_chat_completion = MagicMock(return_value={"choices": [{"message": {"content": poisoned}}]})
         request = ChatCompletionRequest.model_validate(
@@ -204,7 +205,29 @@ class TestIngredientParsingHandler:
                 "model": "gpt-4o",
                 "messages": [
                     {"role": "system", "content": "Parse ingredient strings."},
-                    {"role": "user", "content": '["1 cup flour"]'},
+                    {"role": "user", "content": '["1 cup sugar"]'},
+                ],
+            }
+        )
+        with patch("mealie_local_ai.handlers.ingredient_parsing.LlamaGrammar"):
+            response = await handler.handle(request, model, mealie)
+        result = json.loads(response.choices[0].message.content)
+        assert result["ingredients"][0]["food"] == "sugar"
+        assert model.create_chat_completion.call_count == 1
+
+    @pytest.mark.asyncio
+    async def test_handle_llm_fallthrough_unknown_unit(self):
+        from mealie_local_ai.handlers.ingredient_parsing import IngredientParsingHandler
+
+        handler = IngredientParsingHandler()
+        mealie = self._make_mock_mealie()
+        model = self._make_mock_model([{"quantity": 1, "unit": "bunch", "food": "flour", "note": None}])
+        request = ChatCompletionRequest.model_validate(
+            {
+                "model": "gpt-4o",
+                "messages": [
+                    {"role": "system", "content": "Parse ingredient strings."},
+                    {"role": "user", "content": '["1 bunch flour"]'},
                 ],
             }
         )
@@ -212,6 +235,8 @@ class TestIngredientParsingHandler:
             response = await handler.handle(request, model, mealie)
         result = json.loads(response.choices[0].message.content)
         assert result["ingredients"][0]["food"] == "flour"
+        assert result["ingredients"][0]["unit"] is None
+        assert model.create_chat_completion.call_count == 1
 
     @pytest.mark.asyncio
     async def test_handle_returns_blank_on_unparseable_json(self):
@@ -247,12 +272,7 @@ class TestIngredientParsingHandler:
 
         handler = IngredientParsingHandler()
         mealie = self._make_mock_mealie()
-        model = self._make_mock_model(
-            [
-                {"quantity": 1, "unit": "cup", "food": "flour", "note": None},
-                {"quantity": 2, "unit": None, "food": "egg", "note": None},
-            ]
-        )
+        model = self._make_mock_model([])
         request = ChatCompletionRequest.model_validate(
             {
                 "model": "gpt-4o",
@@ -267,5 +287,5 @@ class TestIngredientParsingHandler:
         result = json.loads(response.choices[0].message.content)
         assert len(result["ingredients"]) == 2
         assert result["ingredients"][0]["food"] == "flour"
-        assert result["ingredients"][1]["food"] == "egg"
-        assert model.create_chat_completion.call_count == 2
+        assert result["ingredients"][1]["food"] == "eggs"
+        assert model.create_chat_completion.call_count == 0
