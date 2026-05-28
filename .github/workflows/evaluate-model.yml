@@ -1,0 +1,175 @@
+name: Evaluate model
+
+on:
+  workflow_dispatch:
+    inputs:
+      run_id:
+        description: >-
+          Fine-tune workflow run ID to pull the GGUF from.
+          Leave blank to use the latest successful run.
+        required: false
+        type: string
+
+env:
+  ARTIFACT_NAME: nuextract-1.5-tiny-finetuned-gguf
+  GGUF_FILE: nuextract-1.5-tiny-finetuned-q8_0.gguf
+
+jobs:
+  evaluate:
+    runs-on: macos-latest
+    permissions:
+      contents: read
+      actions: read
+
+    steps:
+      - name: Resolve fine-tune run ID
+        id: resolve
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if [[ -n "${{ inputs.run_id }}" ]]; then
+            echo "run_id=${{ inputs.run_id }}" >> "$GITHUB_OUTPUT"
+          else
+            run_id=$(gh run list \
+              --repo "${{ github.repository }}" \
+              --workflow "Fine-tune" \
+              --status success \
+              --limit 1 \
+              --json databaseId \
+              --jq '.[0].databaseId')
+            if [[ -z "$run_id" || "$run_id" == "null" ]]; then
+              echo "::error::No successful Fine-tune workflow run found"
+              exit 1
+            fi
+            echo "run_id=$run_id" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Download GGUF artifact
+        uses: actions/download-artifact@v8
+        with:
+          name: ${{ env.ARTIFACT_NAME }}
+          path: models/
+          run-id: ${{ steps.resolve.outputs.run_id }}
+          github-token: ${{ github.token }}
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v7
+        with:
+          enable-cache: true
+          cache-dependency-glob: uv.lock
+
+      - name: Cache venv
+        uses: actions/cache@v4
+        with:
+          path: .venv
+          key: venv-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('uv.lock') }}
+
+      - name: Install dependencies
+        run: uv sync --group dev
+
+      - name: Run extractor tests
+        env:
+          MODEL_INGREDIENT_EXTRACTOR: models/${{ env.GGUF_FILE }}
+        run: |
+          uv run pytest tests/test_extractor_llm_accuracy.py \
+            -v -s --tb=short \
+            --junitxml=results/junit.xml \
+            | tee results/pytest-output.txt
+
+      - name: Generate evaluation report
+        if: always()
+        env:
+          RUN_ID: ${{ steps.resolve.outputs.run_id }}
+        run: |
+          python3 - <<'PYEOF'
+          import json, os
+
+          run_id = os.environ["RUN_ID"]
+          repo = os.environ["GITHUB_REPOSITORY"]
+          summary_path = os.environ["GITHUB_STEP_SUMMARY"]
+          report_path = "results/extractor-report.json"
+
+          if not os.path.exists(report_path):
+              with open(summary_path, "a") as f:
+                  f.write("## Evaluation Report\n\nNo results found — tests may not have run.\n")
+              raise SystemExit(0)
+
+          with open(report_path) as f:
+              results = json.load(f)
+
+          csv_results = [r for r in results if r.get("suite") == "csv"]
+          novel_results = [r for r in results if r.get("suite") == "novel"]
+
+          csv_pass = sum(1 for r in csv_results if r["status"] == "pass")
+          csv_total = len(csv_results)
+          novel_pass = sum(1 for r in novel_results if r["status"] == "pass")
+          novel_total = len(novel_results)
+
+          lines = []
+          lines.append("## Evaluation Report\n")
+          lines.append(f"**Fine-tune run:** [{run_id}](https://github.com/{repo}/actions/runs/{run_id})\n")
+          lines.append(f"| Suite | Pass | Total | Rate |")
+          lines.append(f"|-------|------|-------|------|")
+          if csv_total:
+              lines.append(f"| CSV training | {csv_pass} | {csv_total} | {csv_pass/csv_total*100:.0f}% |")
+          if novel_total:
+              lines.append(f"| Novel structural | {novel_pass} | {novel_total} | {novel_pass/novel_total*100:.0f}% |")
+          lines.append("")
+
+          if csv_results:
+              sorted_csv = sorted(csv_results, key=lambda r: (r["status"] != "fail", r["input"]))
+              lines.append("### CSV Training Results\n")
+              lines.append("| Status | Input | Actual | Expected | Jaccard |")
+              lines.append("|--------|-------|--------|----------|---------|")
+              for r in sorted_csv:
+                  s = "❌" if r["status"] == "fail" else "✅"
+                  a = r["actual"]
+                  actual_str = f'qty={a["quantity"]} unit={a["unit"]} food={a["food"]}'
+                  if a.get("note"):
+                      actual_str += f' note={a["note"]}'
+                  if r["status"] == "fail" and r.get("expected"):
+                      e = r["expected"]
+                      diff_parts = []
+                      for field in r.get("mismatches", []):
+                          diff_parts.append(f"{field}={e.get(field, '')}")
+                      expected_str = ", ".join(diff_parts)
+                  else:
+                      expected_str = ""
+                  jac = f'{r["jaccard"]:.2f}' if r.get("jaccard") is not None else ""
+                  inp = r["input"].replace("|", "\\|")
+                  lines.append(f"| {s} | {inp} | {actual_str} | {expected_str} | {jac} |")
+              lines.append("")
+
+          if novel_results:
+              sorted_novel = sorted(novel_results, key=lambda r: (r["status"] != "fail", r["input"]))
+              lines.append("### Novel Ingredient Results\n")
+              lines.append("| Status | Input | Actual |")
+              lines.append("|--------|-------|--------|")
+              for r in sorted_novel:
+                  s = "❌" if r["status"] == "fail" else "✅"
+                  a = r["actual"]
+                  actual_str = f'qty={a["quantity"]} unit={a["unit"]} food={a["food"]}'
+                  if a.get("note"):
+                      actual_str += f' note={a["note"]}'
+                  inp = r["input"].replace("|", "\\|")
+                  lines.append(f"| {s} | {inp} | {actual_str} |")
+              lines.append("")
+
+          with open(summary_path, "a") as f:
+              f.write("\n".join(lines))
+          PYEOF
+
+      - name: Upload results
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: evaluation-results
+          path: |
+            results/junit.xml
+            results/pytest-output.txt
+            results/extractor-report.json
+          retention-days: 30
+          if-no-files-found: warn
