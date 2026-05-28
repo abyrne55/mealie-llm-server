@@ -127,7 +127,7 @@
 | 104 | 1 teaspoon vanilla extract | 1 | teaspoon | vanilla extract |  |
 | 105 | 1 1/2 cups/360 milliliters heavy cream | 1.5 | cups | heavy cream | (360 ml) |
 | 106 | 8 ounces/225 grams bittersweet chocolate chips | 225 | grams | chocolate | (8 oz) bittersweet preferred |
-| 107 | 2 tablespoons extra-virgin olive oil | 2 | tablespoons | extra virgin olive oil |  |
+| 107 | 2 tablespoons extra-virgin olive oil | 2 | tablespoons | olive oil |  |
 | 108 | 2 garlic cloves, minced or puréed | 2 | cloves | garlic | minced or puréed |
 | 109 | 1 teaspoon chopped fresh rosemary | 1 | teaspoon | rosemary | chopped, fresh |
 | 110 | 2 boneless skinless chicken breasts | 2 |  | chicken breast | boneless, skinless |
@@ -159,7 +159,7 @@
 | 136 | 2½ tsp garam masala, plus more to taste | 2.5 | tsp | garam masala | plus more to taste |
 | 137 | ½ tsp ground cinnamon | 0.5 | tsp | cinnamon |  |
 | 138 | ⅔ cup nutritional yeast | 0.666 | cup | nutritional yeast |  |
-| 139 | ⅓ cup extra-virgin olive oil, plus more for drizzling | 0.333 | cup | extra virgin olive oil | plus more for drizzling |
+| 139 | ⅓ cup extra-virgin olive oil, plus more for drizzling | 0.333 | cup | olive oil | plus more for drizzling |
 | 140 | 1½ lemons, squeezed as needed (optional) | 1.5 |  | lemon | optional, squeezed as needed |
 | 141 | ⅓ cup roasted peanuts (salted or unsalted) | 0.333 | cup | peanut | roasted, salted or unsalted |
 | 142 | ⅓ cup dry white wine | 0.333 | cup | white wine | dry |
@@ -177,7 +177,7 @@
 | 154 | ⅗ lb ground beef | 0.6 | lb | ground beef |  |
 | 155 | 1 ½ cups rice | 1.5 | cups | rice |  |
 | 156 | 2 ¼ tsp vanilla extract | 2.25 | tsp | vanilla extract |  |
-| 157 | 3 ⅓ tbsp extra-virgin olive oil | 3.333 | tbsp | extra virgin olive oil |  |
+| 157 | 3 ⅓ tbsp extra-virgin olive oil | 3.333 | tbsp | olive oil |  |
 | 158 | 1 ¾ cups soy sauce | 1.75 | cups | soy sauce |  |
 | 159 | 2⅜ tsp baking powder | 2.375 | tsp | baking powder |  |
 | 160 | 1⅝ oz cream cheese | 1.625 | oz | cream cheese |  |

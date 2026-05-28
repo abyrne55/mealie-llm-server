@@ -13,6 +13,7 @@ Usage:
 from __future__ import annotations
 
 import argparse
+import gc
 import logging
 import subprocess
 import sys
@@ -24,7 +25,7 @@ sys.path.insert(0, str(PROJECT_ROOT))
 import torch  # noqa: E402
 from datasets import Dataset  # noqa: E402
 from peft import LoraConfig, get_peft_model  # noqa: E402
-from transformers import AutoModelForCausalLM, AutoTokenizer  # noqa: E402
+from transformers import AutoModelForCausalLM, AutoTokenizer, TrainerCallback  # noqa: E402
 from trl import SFTConfig, SFTTrainer  # noqa: E402
 
 from scripts.training_data import load_training_data, rows_to_dataset  # noqa: E402
@@ -47,10 +48,10 @@ def parse_args() -> argparse.Namespace:
     p.add_argument("--lr", type=float, default=2e-4)
     p.add_argument("--lora-rank", type=int, default=16)
     p.add_argument("--lora-alpha", type=int, default=32)
-    p.add_argument("--batch-size", type=int, default=1)
-    p.add_argument("--grad-accum", type=int, default=8)
+    p.add_argument("--batch-size", type=int, default=2)
+    p.add_argument("--grad-accum", type=int, default=4)
     p.add_argument("--max-seq-length", type=int, default=512)
-    p.add_argument("--warmup-ratio", type=float, default=0.1)
+    p.add_argument("--warmup-steps", type=int, default=6)
     p.add_argument("--weight-decay", type=float, default=0.01)
     p.add_argument("--skip-convert", action="store_true", help="Skip GGUF conversion")
     p.add_argument("--output-dir", type=Path, default=OUTPUT_DIR)
@@ -73,10 +74,12 @@ def train(args: argparse.Namespace) -> Path:
     if tokenizer.pad_token is None:
         tokenizer.pad_token = tokenizer.eos_token
 
+    has_mps = torch.backends.mps.is_available()
+    logger.info("Device: %s", "mps" if has_mps else "cpu")
+
     model = AutoModelForCausalLM.from_pretrained(
         BASE_MODEL,
-        torch_dtype=torch.float32,
-        device_map="auto" if torch.cuda.is_available() else None,
+        dtype=torch.float32,
     )
 
     lora_config = LoraConfig(
@@ -104,24 +107,36 @@ def train(args: argparse.Namespace) -> Path:
         per_device_train_batch_size=args.batch_size,
         gradient_accumulation_steps=args.grad_accum,
         learning_rate=args.lr,
-        warmup_ratio=args.warmup_ratio,
+        warmup_steps=args.warmup_steps,
         weight_decay=args.weight_decay,
-        bf16=torch.cuda.is_available(),
+        bf16=False,
         fp16=False,
+        dataloader_pin_memory=False,
         logging_steps=1,
-        save_strategy="epoch",
-        optim="adamw_torch",
+        save_strategy="no",
+        optim="adamw_torch_fused",
         report_to="none",
         max_grad_norm=1.0,
         max_length=args.max_seq_length,
         dataset_text_field="text",
     )
 
+    callbacks = []
+    if has_mps:
+
+        class MPSCacheClearCallback(TrainerCallback):
+            def on_step_end(self, args, state, control, **kwargs):
+                gc.collect()
+                torch.mps.empty_cache()
+
+        callbacks.append(MPSCacheClearCallback())
+
     trainer = SFTTrainer(
         model=model,
         train_dataset=dataset,
         args=training_args,
         processing_class=tokenizer,
+        callbacks=callbacks,
     )
 
     logger.info("Starting training...")

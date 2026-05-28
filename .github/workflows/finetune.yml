@@ -10,7 +10,7 @@ on:
 
 jobs:
   finetune:
-    runs-on: ubuntu-24.04-arm
+    runs-on: macos-latest
     permissions:
       contents: read
 
@@ -22,13 +22,21 @@ jobs:
         uses: astral-sh/setup-uv@v7
         with:
           enable-cache: true
+          cache-dependency-glob: uv.lock
+
+      - name: Cache venv
+        uses: actions/cache@v4
+        with:
+          path: .venv
+          key: venv-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('uv.lock') }}
 
       - name: Install dependencies
         run: uv sync --group train
 
       - name: Fine-tune model
         env:
-          OMP_NUM_THREADS: "4"
+          PYTORCH_MPS_HIGH_WATERMARK_RATIO: "0.0"
+          PYTORCH_ENABLE_MPS_FALLBACK: "1"
         run: uv run python scripts/finetune.py
 
       - name: Upload GGUF artifact
