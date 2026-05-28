@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 import logging
 import re
+import unicodedata
 from fractions import Fraction
 from importlib.resources import files
 from typing import TYPE_CHECKING, Any
@@ -11,6 +12,7 @@ from llama_cpp import LlamaGrammar
 
 from mealie_local_ai.handlers.base import Handler
 from mealie_local_ai.models import ChatCompletionRequest, ChatCompletionResponse, build_chat_completion_response
+from mealie_local_ai.regex_parser import RegexParser
 
 if TYPE_CHECKING:
     from llama_cpp import Llama
@@ -109,7 +111,12 @@ def normalize_quantity(value: Any) -> float | None:
     if isinstance(value, (int, float)):
         return float(value)
     if isinstance(value, str):
-        parts = value.strip().split()
+        s = value.strip()
+        if s and unicodedata.category(s[-1]) == "No":
+            frac = unicodedata.numeric(s[-1])
+            prefix = s[:-1].strip()
+            return float(prefix) + frac if prefix else frac
+        parts = s.split()
         if len(parts) == 2 and "/" in parts[1]:
             return float(parts[0]) + float(Fraction(parts[1]))
         if len(parts) == 1 and "/" in parts[0]:
@@ -125,6 +132,7 @@ class IngredientParsingHandler(Handler):
         self.reference_prompt = files("mealie_local_ai.prompts").joinpath("parse-recipe-ingredients.txt").read_text()
         self._food_resolver = food_resolver
         self._model_id = model_id
+        self._regex_parser = RegexParser()
 
     async def handle(
         self,
@@ -138,10 +146,19 @@ class IngredientParsingHandler(Handler):
         foods = await mealie_client.get_foods()
         unit_aliases = await mealie_client.get_unit_aliases()
 
+        all_units = [a for aliases in unit_aliases.values() for a in aliases]
+        self._regex_parser.build(foods, all_units)
+
         grammar = LlamaGrammar.from_json_schema(json.dumps(_STRUCTURE_SCHEMA))
 
         results = []
         for ingredient_text in ingredients:
+            regex_result = self._regex_parser.try_parse(ingredient_text)
+            if regex_result is not None:
+                logger.info("Regex match: %r -> %s", ingredient_text, regex_result)
+                results.append(regex_result)
+                continue
+
             messages = build_messages(ingredient_text)
             response = model.create_chat_completion(
                 messages=messages,
