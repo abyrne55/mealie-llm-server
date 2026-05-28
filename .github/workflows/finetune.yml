@@ -4,6 +4,7 @@ on:
   push:
     branches: [main]
     paths:
+      - scripts/finetune.py
       - tests/integration/ingredients.csv
   workflow_dispatch:
 

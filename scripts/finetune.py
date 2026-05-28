@@ -75,6 +75,7 @@ def train(args: argparse.Namespace) -> Path:
 
     model = AutoModelForCausalLM.from_pretrained(
         BASE_MODEL,
+        torch_dtype=torch.float32,
         device_map="auto" if torch.cuda.is_available() else None,
     )
 
@@ -105,7 +106,8 @@ def train(args: argparse.Namespace) -> Path:
         learning_rate=args.lr,
         warmup_ratio=args.warmup_ratio,
         weight_decay=args.weight_decay,
-        use_cpu=not torch.cuda.is_available(),
+        bf16=torch.cuda.is_available(),
+        fp16=False,
         logging_steps=1,
         save_strategy="epoch",
         optim="adamw_torch",
