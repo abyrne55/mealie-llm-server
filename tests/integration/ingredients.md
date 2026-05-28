@@ -23,7 +23,7 @@
 |---|----------|-----|------|------|------|
 | 1 | 1 cup flour | 1 | cup | flour |  |
 | 2 | 2 tablespoons olive oil | 2 | tablespoons | olive oil |  |
-| 3 | 3 eggs | 3 |  | egg |  |
+| 3 | 3 eggs | 3 |  | eggs |  |
 | 4 | 1 1/2 cups chicken broth | 1.5 | cups | chicken broth |  |
 | 5 | 4 tbsp butter | 4 | tbsp | butter |  |
 | 6 | 2 tsp vanilla extract | 2 | tsp | vanilla extract |  |
@@ -68,7 +68,7 @@
 | 45 | 2 tablespoons dark brown sugar | 2 | tablespoons | brown sugar | dark preferred |
 | 46 | 1 to 2 tablespoons chile sauce, such as sambal oelek or Sriracha | 1.5 | tablespoons | chili sauce | such as sambal oelek or Sriracha |
 | 47 | 3 tablespoons neutral oil (such as grapeseed or sunflower), plus more as needed | 3 | tablespoons | neutral oil | such as grapeseed or sunflower, plus more as needed |
-| 48 | 2 (8-ounce) packages tempeh, crumbled into pieces no larger than ½ inch | 2 | pack | tempeh | (16 oz) crumbled into ½ inch pieces |
+| 48 | 2 (8-ounce) packages tempeh, crumbled into pieces no larger than ½ inch | 2 | packs | tempeh | (16 oz) crumbled into ½ inch pieces |
 | 49 | 1/3 cup nutritional yeast | 0.333 | cup | nutritional yeast |  |
 | 50 | 1/4 cup cashew butter | 0.25 | cup | cashew butter |  |
 | 51 | 2 tablespoons white miso paste | 2 | tablespoons | white miso |  |
@@ -88,14 +88,14 @@
 | 65 | Coarsely chopped cilantro leaves and tender stems, for serving |  |  | cilantro | leaves & stems coarsely chopped, for serving |
 | 66 | 1 1/2 to 2 pounds zucchini (about 3 to 4 medium) | 1.75 | pounds | zucchini | (3-4 medium zucchini) |
 | 67 | 1 jalapeño, halved lengthwise, stemmed and sliced into 1/8-inch-thick half-moons | 1 |  | jalapeño | halved lengthwise, stemmed and sliced into ⅛-inch-thick half-moons |
-| 68 | 2 limes, 1 zested and juiced, the other cut into wedges for serving | 2 |  | lime | 1 zested and juiced, the other cut into wedges for serving |
+| 68 | 2 limes, 1 zested and juiced, the other cut into wedges for serving | 2 |  | limes | 1 zested and juiced, the other cut into wedges for serving |
 | 69 | ¾ cup corn oil, plus more as needed | 0.75 | cup | corn oil | plus more as needed |
 | 70 | 1 (15-ounce) can chickpeas or 1 1/2 cups cooked chickpeas, rinsed and patted dry | 1 | can | chickpeas | (15 oz / 1½ cups) drained, rinsed, patted dry |
-| 71 | 1/4 cup roasted peanuts (salted or unsalted) | 0.25 | cup | peanut | roasted, salted or unsalted |
+| 71 | 1/4 cup roasted peanuts (salted or unsalted) | 0.25 | cup | peanuts | roasted, salted or unsalted |
 | 72 | 1 1/2 teaspoons ground sumac, coriander or a coriander-based spice blend like baharat or berbere | 1.5 | teaspoons | sumac | or coriander or a coriander-based spice blend like baharat or berbere |
-| 73 | 8 Hawaiian sweet rolls (from a 12-ounce package) | 8 |  | hawaiian roll | from a 12 oz package |
+| 73 | 8 Hawaiian sweet rolls (from a 12-ounce package) | 8 |  | hawaiian rolls | from a 12 oz package |
 | 74 | 2 tablespoons unsalted butter, melted | 2 | tablespoons | butter | unsalted, melted |
-| 75 | 1 tablespoon white sesame seeds | 1 | tablespoon | sesame seed | white |
+| 75 | 1 tablespoon white sesame seeds | 1 | tablespoon | sesame seeds | white |
 | 76 | 1 pound lean ground beef (10-percent fat) | 1 | pound | ground beef | 10% fat preferred |
 | 77 | 2 teaspoons vegetable oil | 2 | teaspoons | vegetable oil |  |
 | 78 | 4 slices American cheese, cut into quarters | 4 | slices | american cheese | cut into quarters |
@@ -116,12 +116,12 @@
 | 93 | 1 teaspoon baking powder | 1 | teaspoon | baking powder |  |
 | 94 | 1 teaspoon baking soda | 1 | teaspoon | baking soda |  |
 | 95 | 2/3 cup/150 grams sour cream | 150 | grams | sour cream | (⅔ cup) |
-| 96 | 2 large eggs | 2 |  | egg |  |
+| 96 | 2 large eggs | 2 |  | eggs |  |
 | 97 | 2 teaspoons vanilla extract | 2 | teaspoons | vanilla extract |  |
 | 98 | 2/3 cup/158 milliliters hot coffee | 0.666 | cup | coffee | (158 ml) hot |
 | 99 | 1 1/4 cups/280 grams unsalted butter, softened to room temperature, divided | 280 | grams | butter | (1¼ cups) unsalted, softened to room temperature, divided |
 | 100 | 7 ounces/200 grams thawed frozen kataifi, clumps separated if needed, roughly chopped (about 3 lightly packed cups), see Tip | 200 | grams | kataifi | (7 oz / 3 lightly-packed cups) thawed, clumps separated if needed, roughly chopped |
-| 101 | 1 1/4 cups/170 grams shelled raw pistachios | 170 | grams | pistachio | (1¼ cups) shelled, raw |
+| 101 | 1 1/4 cups/170 grams shelled raw pistachios | 170 | grams | pistachios | (1¼ cups) shelled, raw |
 | 102 | 2 tablespoons canola or grapeseed oil | 2 | tablespoons | canola oil | or grapeseed oil |
 | 103 | 2 cups/240 grams powdered sugar | 240 | grams | powdered sugar | (2 cups) |
 | 104 | 1 teaspoon vanilla extract | 1 | teaspoon | vanilla extract |  |
@@ -130,20 +130,20 @@
 | 107 | 2 tablespoons extra-virgin olive oil | 2 | tablespoons | olive oil |  |
 | 108 | 2 garlic cloves, minced or puréed | 2 | cloves | garlic | minced or puréed |
 | 109 | 1 teaspoon chopped fresh rosemary | 1 | teaspoon | rosemary | chopped, fresh |
-| 110 | 2 boneless skinless chicken breasts | 2 |  | chicken breast | boneless, skinless |
+| 110 | 2 boneless skinless chicken breasts | 2 |  | chicken breasts | boneless, skinless |
 | 111 | 1/4 cup dry white wine | 0.25 | cup | white wine | dry |
-| 112 | 2 heaped cups cherry tomatoes, about 3/4 pound | 2 | cups | cherry tomato | (¾ lb) |
+| 112 | 2 heaped cups cherry tomatoes, about 3/4 pound | 2 | cups | cherry tomatoes | (¾ lb) |
 | 113 | Pinch of sugar | 1 | pinch | sugar |  |
 | 114 | 2 tablespoons all-purpose flour or a gluten- free flour such as rice flour or corn flour | 2 | tablespoons | flour | or gluten-free flour (e.g., rice flour, corn flour) |
 | 115 | 2 tablespoons grapeseed, sunflower or canola oil | 2 | tablespoons | canola oil | or grapeseed oil or sunflower oil |
 | 116 | 1 tablespoon chopped flat-leaf parsley | 1 | tablespoon | parsley | chopped, flat-leaf |
 | 117 | 1/4 cup grated Parmesan (optional) | 0.25 | cup | parmesan cheese | optional, grated |
-| 118 | 2 ½ pounds bone-in, skin-on chicken thighs | 2.5 | pounds | chicken thigh | bone-in, skin-on |
+| 118 | 2 ½ pounds bone-in, skin-on chicken thighs | 2.5 | pounds | chicken thighs | bone-in, skin-on |
 | 119 | 2 medium leeks, trimmed, halved lengthwise, thinly sliced crosswise then rinsed | 2 |  | leeks | trimmed, halved lengthwise, thinly sliced crosswise then rinsed |
 | 120 | 6 garlic cloves, thinly sliced | 6 | cloves | garlic | thinly sliced |
 | 121 | 1 lemon | 1 |  | lemon |  |
 | 122 | 1 cup low-sodium chicken broth or water | 1 | cup | chicken broth | low-sodium preferred, or water |
-| 123 | 1 cup fresh or frozen peas | 1 | cup | pea | fresh or frozen |
+| 123 | 1 cup fresh or frozen peas | 1 | cup | peas | fresh or frozen |
 | 124 | 1 cup fresh dill or mint leaves, torn if large | 1 | cup | dill | or mint, fresh leaves, torn if large |
 | 125 | 2 cups minus 2 tablespoons cake flour (8 1/2 ounces) | 8.5 | ounces | cake flour | (2 cups minus 2 tbsp) |
 | 126 | 1 2/3 cups bread flour (8 1/2 ounces) | 8.5 | ounces | bread flour | (1⅔ cups) |
@@ -160,8 +160,8 @@
 | 137 | ½ tsp ground cinnamon | 0.5 | tsp | cinnamon |  |
 | 138 | ⅔ cup nutritional yeast | 0.666 | cup | nutritional yeast |  |
 | 139 | ⅓ cup extra-virgin olive oil, plus more for drizzling | 0.333 | cup | olive oil | plus more for drizzling |
-| 140 | 1½ lemons, squeezed as needed (optional) | 1.5 |  | lemon | optional, squeezed as needed |
-| 141 | ⅓ cup roasted peanuts (salted or unsalted) | 0.333 | cup | peanut | roasted, salted or unsalted |
+| 140 | 1½ lemons, squeezed as needed (optional) | 1.5 |  | lemons | optional, squeezed as needed |
+| 141 | ⅓ cup roasted peanuts (salted or unsalted) | 0.333 | cup | peanuts | roasted, salted or unsalted |
 | 142 | ⅓ cup dry white wine | 0.333 | cup | white wine | dry |
 | 143 | 1¾ tsp baking soda | 1.75 | tsp | baking soda |  |
 | 144 | 2¼ tsp baking powder | 2.25 | tsp | baking powder |  |
@@ -182,7 +182,7 @@
 | 159 | 2⅜ tsp baking powder | 2.375 | tsp | baking powder |  |
 | 160 | 1⅝ oz cream cheese | 1.625 | oz | cream cheese |  |
 | 161 | ½ tablespoon onion powder | 0.5 | tablespoon | onion powder |  |
-| 162 | 2 boneless, skinless chicken breasts, about 1 ½ to 2 pounds (see Tip) | 2 |  | chicken breast | (1½-2 lb) boneless, skinless |
-| 163 | 1 ¼ pounds rhubarb, trimmed and cut into 1-inch pieces (about 4 cups) | 1.25 | pound | rhubarb | trimmed and cut into 1-inch pieces |
+| 162 | 2 boneless, skinless chicken breasts, about 1 ½ to 2 pounds (see Tip) | 2 |  | chicken breasts | (1½-2 lb) boneless, skinless |
+| 163 | 1 ¼ pounds rhubarb, trimmed and cut into 1-inch pieces (about 4 cups) | 1.25 | pounds | rhubarb | trimmed and cut into 1-inch pieces |
 | 164 | ½ to ⅔ cup sugar | 0.5 | cup | sugar | up to ⅔ cup |
 | 165 | 1 vanilla bean, halved lengthwise; 1 teaspoon cardamom pods; or 1 (1-inch) piece fresh ginger, sliced into coins, for flavoring (optional) | 1 |  | vanilla bean | halved lengthwise, or 1 tsp cardamom pods, or 1 inch of sliced ginger (optional) |
