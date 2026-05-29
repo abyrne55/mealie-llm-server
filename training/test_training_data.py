@@ -3,7 +3,7 @@ from __future__ import annotations
 import textwrap
 from pathlib import Path
 
-from scripts.training_data import load_training_data
+from training.training_data import load_training_data
 
 
 def test_load_training_data(tmp_path: Path):

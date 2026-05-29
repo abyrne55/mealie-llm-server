@@ -118,11 +118,11 @@ podman stop mealie-test && podman rm mealie-test
 
 ### Fine-Tuning
 
-The extraction model can be fine-tuned on the ingredient dataset in `tests/integration/ingredients.csv` using LoRA:
+The extraction model can be fine-tuned on the ingredient dataset in `training/ingredients.csv` using LoRA:
 
 ```bash
 uv sync --group train
-uv run python scripts/finetune.py        # CPU
+uv run python training/finetune.py        # CPU
 ```
 
-Or use `notebooks/finetune.ipynb` for GPU training on Google Colab (~2 min on T4).
+Or use the `Fine-tune` GitHub Actions workflow for GPU training on macOS runners.

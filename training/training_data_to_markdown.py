@@ -5,7 +5,7 @@ Writes to <input>.md (sibling of the input .csv). Exits 0 if already
 up to date, 1 if the file was updated (for use as a pre-commit hook).
 
 Usage:
-    uv run python scripts/training_data_to_markdown.py tests/integration/ingredients.csv
+    uv run python training/training_data_to_markdown.py training/ingredients.csv
 """
 
 from __future__ import annotations
@@ -13,12 +13,12 @@ from __future__ import annotations
 import sys
 from pathlib import Path
 
-# Add scripts directory to path for imports
-sys.path.insert(0, str(Path(__file__).resolve().parent))
+PROJECT_ROOT = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(PROJECT_ROOT))
 
-from training_data import load_training_data
+from training.training_data import load_training_data  # noqa: E402
 
-CSV_PATH = Path(__file__).resolve().parent.parent / "tests" / "integration" / "ingredients.csv"
+CSV_PATH = Path(__file__).parent / "ingredients.csv"
 
 PROMPT_TEMPLATE = """\
 ```

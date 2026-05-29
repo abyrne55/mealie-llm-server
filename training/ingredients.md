@@ -51,7 +51,7 @@
 | 28 | 2 large lemons, zested and juiced | 2 |  | lemons | zested and juiced |
 | 29 | 1 large garlic clove | 1 | clove | garlic |  |
 | 30 | 1 packed cup fresh basil leaves, plus more for garnish if desired | 1 | cup | basil | fresh, plus more for garnish |
-| 31 | 1 cup/1½ ounces finely grated Parmigiano-Reggiano cheese, plus more for garnish if desired | 1 | cup | parmesan cheese | (1½ oz) finely grated, plus more for garnish |
+| 31 | 1 cup/1½ ounces finely grated Parmigiano-Reggiano cheese, plus more for garnish if desired | 1 | cup | parmigiano reggiano cheese | (1½ oz) finely grated, plus more for garnish |
 | 32 | 3 tablespoons extra-virgin olive oil | 3 | tablespoons | olive oil |  |
 | 33 | 1 medium yellow or red onion, diced | 1 |  | yellow onion | or red onion, diced |
 | 34 | 1 tablespoon tomato paste | 1 | tablespoon | tomato paste |  |
@@ -66,7 +66,7 @@
 | 43 | ¼ cup soy sauce | 0.25 | cup | soy sauce |  |
 | 44 | 2 tablespoons rice vinegar | 2 | tablespoons | rice vinegar |  |
 | 45 | 2 tablespoons dark brown sugar | 2 | tablespoons | brown sugar | dark preferred |
-| 46 | 1 to 2 tablespoons chile sauce, such as sambal oelek or Sriracha | 1.5 | tablespoons | chili sauce | such as sambal oelek or Sriracha |
+| 46 | 1 to 2 tablespoons chile sauce, such as sambal oelek or Sriracha | 1.5 | tablespoons | chile sauce | such as sambal oelek or Sriracha |
 | 47 | 3 tablespoons neutral oil (such as grapeseed or sunflower), plus more as needed | 3 | tablespoons | neutral oil | such as grapeseed or sunflower, plus more as needed |
 | 48 | 2 (8-ounce) packages tempeh, crumbled into pieces no larger than ½ inch | 2 | packs | tempeh | (16 oz) crumbled into ½ inch pieces |
 | 49 | 1/3 cup nutritional yeast | 0.333 | cup | nutritional yeast |  |

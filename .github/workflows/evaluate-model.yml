@@ -75,7 +75,7 @@ jobs:
           MODEL_INGREDIENT_EXTRACTOR: models/${{ env.GGUF_FILE }}
         run: |
           mkdir -p results
-          uv run pytest tests/test_extractor_llm_accuracy.py \
+          uv run pytest training/test_evaluate.py \
             -v -s --tb=short \
             --junitxml=results/junit.xml \
             | tee results/pytest-output.txt
