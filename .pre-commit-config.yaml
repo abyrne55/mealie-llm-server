@@ -15,13 +15,13 @@ repos:
     hooks:
       - id: validate-training-data
         name: validate training data
-        entry: python scripts/validate_training_data.py
+        entry: python training/validate_training_data.py
         language: python
         files: ingredients\.csv$
 
       - id: sync-ingredients-md
         name: sync ingredients.md
-        entry: python scripts/training_data_to_markdown.py tests/integration/ingredients.csv
+        entry: python training/training_data_to_markdown.py training/ingredients.csv
         language: python
         files: ingredients\.(csv|md)$
         pass_filenames: false

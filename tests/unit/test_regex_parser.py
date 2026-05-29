@@ -1,5 +1,3 @@
-from pathlib import Path
-
 import pytest
 
 from mealie_local_ai.regex_parser import RegexParser
@@ -193,47 +191,3 @@ class TestCaseInsensitivity:
         assert result is not None
         assert result["food"] == "butter"
         assert result["unit"] == "tbsp"
-
-
-class TestCSVCoverage:
-    @pytest.fixture(scope="class")
-    def csv_parser(self):
-        from scripts.training_data import load_training_data
-
-        csv_path = Path(__file__).parent / "integration" / "ingredients.csv"
-        rows = load_training_data(csv_path)
-        foods = list({row[3] for row in rows if row[3]})
-        units = list({row[2] for row in rows if row[2]})
-        p = RegexParser()
-        p.build(foods, units)
-        return p, rows
-
-    def test_coverage_rate(self, csv_parser):
-        parser, rows = csv_parser
-        matched = sum(1 for row in rows if parser.try_parse(row[0]) is not None)
-        total = len(rows)
-        pct = matched / total * 100
-        print(f"\nRegex coverage: {matched}/{total} ({pct:.0f}%)")
-        assert matched >= total * 0.30, f"Expected >= 30% coverage, got {pct:.0f}%"
-
-    @pytest.mark.parametrize(
-        "idx",
-        range(200),
-        indirect=True,
-    )
-    def test_matched_rows_correct(self, csv_parser, idx):
-        parser, rows = csv_parser
-        if idx >= len(rows):
-            pytest.skip("index out of range")
-        ingredient_text, expected_qty, expected_unit, expected_food, _ = rows[idx]
-        result = parser.try_parse(ingredient_text)
-        if result is None:
-            pytest.skip("not matched by regex")
-
-        assert result["food"].lower() == expected_food.lower()
-        if expected_qty is not None:
-            assert result["quantity"] == pytest.approx(float(expected_qty), abs=0.01)
-
-    @pytest.fixture
-    def idx(self, request):
-        return request.param

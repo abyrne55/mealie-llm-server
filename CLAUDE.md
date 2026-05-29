@@ -7,7 +7,8 @@ OpenAI-compatible API gateway for Mealie that routes ingredient parsing to a loc
 ```bash
 uv sync                                           # install deps
 uv run uvicorn mealie_local_ai.app:app --reload  # run locally
-uv run pytest -v                                   # run tests
+uv run pytest tests/unit/ -v                       # fast unit tests
+uv run pytest tests/ -v                            # all tests
 uv run ruff check .                                # lint
 ```
 
@@ -52,9 +53,12 @@ Request flow: `POST /v1/chat/completions` → Router (jaccard similarity on syst
 | `mealie_local_ai/mealie_client.py` | Mealie API client with TTL cache |
 | `mealie_local_ai/model_manager.py` | LLM loading/unloading |
 | `mealie_local_ai/proxy.py` | Upstream reverse proxy |
-| `scripts/extract_training_data.py` | Extract CSV training data from Mealie API + recipe pages |
-| `scripts/training_data.py` | Shared CSV training data loader |
-| `scripts/validate_training_data.py` | Validate CSV dataset format and constraints |
+| `training/extract_training_data.py` | Extract CSV training data from Mealie API + recipe pages |
+| `training/training_data.py` | Shared CSV training data loader |
+| `training/validate_training_data.py` | Validate CSV dataset format and constraints |
+| `training/finetune.py` | Fine-tune NuExtract-tiny-v1.5 with LoRA |
+| `training/ingredients.csv` | Fine-tuning dataset |
+| `training/test_evaluate.py` | LLM extraction accuracy evaluation |
 
 ## Environment Variables
 
@@ -80,7 +84,7 @@ All env vars support `_FILE` variants for container secrets (e.g. `MEALIE_API_KE
 
 ## Fine-Tuning Dataset
 
-`tests/integration/ingredients.csv` is the training dataset for fine-tuning the extraction model (HuggingFace `trl.SFTTrainer` + `peft` LoRA). Each row has 5 columns: `ingredient_text`, `quantity`, `unit`, `food`, `note`. The training pipeline reconstructs the OpenAI messages format via `build_messages()` at training time. Fine-tune with `uv sync --group train && uv run python scripts/finetune.py` (CPU) or use `notebooks/finetune.ipynb` (Colab GPU, ~5 min on T4). The dataset is shuffled (seed=42) during training.
+`training/ingredients.csv` is the training dataset for fine-tuning the extraction model (HuggingFace `trl.SFTTrainer` + `peft` LoRA). Each row has 5 columns: `ingredient_text`, `quantity`, `unit`, `food`, `note`. The training pipeline reconstructs the OpenAI messages format via `build_messages()` at training time. Fine-tune with `uv sync --group train && uv run python training/finetune.py` (CPU) or use the `Fine-tune` GitHub Actions workflow (macOS runner with MPS GPU). The dataset is shuffled (seed=42) during training.
 
 ### Expanding the Dataset
 
@@ -90,9 +94,9 @@ To add new training examples from hand-corrected Mealie recipes:
 2. Run the extraction script against the Mealie API:
 
 ```bash
-uv run python scripts/extract_training_data.py              # uses .env.test
-uv run python scripts/extract_training_data.py --dry-run     # preview without writing
-uv run python scripts/validate_training_data.py tests/integration/ingredients.csv  # validate
+uv run python training/extract_training_data.py              # uses .env.test
+uv run python training/extract_training_data.py --dry-run     # preview without writing
+uv run python training/validate_training_data.py training/ingredients.csv  # validate
 ```
 
 The script fetches all recipes from Mealie, scrapes the original recipe pages for raw ingredient text, and appends new deduplicated entries to the CSV. Foods not in the en-US seed database are included with a warning. Requires `MEALIE_URL` and `MEALIE_API_KEY` (from env, `.env.test`, or `--mealie-url`/`--mealie-api-key` flags).

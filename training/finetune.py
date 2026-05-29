@@ -5,9 +5,9 @@ Pipeline: load base model -> apply LoRA -> train with SFTTrainer -> merge -> sav
 
 Usage:
     uv sync --group train
-    uv run python scripts/finetune.py                        # defaults
-    uv run python scripts/finetune.py --epochs 5 --lr 1e-4   # tune
-    uv run python scripts/finetune.py --skip-convert          # train only, no GGUF
+    uv run python training/finetune.py                        # defaults
+    uv run python training/finetune.py --epochs 5 --lr 1e-4   # tune
+    uv run python training/finetune.py --skip-convert          # train only, no GGUF
 """
 
 from __future__ import annotations
@@ -28,13 +28,13 @@ from peft import LoraConfig, get_peft_model  # noqa: E402
 from transformers import AutoModelForCausalLM, AutoTokenizer, TrainerCallback  # noqa: E402
 from trl import SFTConfig, SFTTrainer  # noqa: E402
 
-from scripts.training_data import load_training_data, rows_to_dataset  # noqa: E402
+from training.training_data import load_training_data, rows_to_dataset  # noqa: E402
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
 logger = logging.getLogger(__name__)
 
 BASE_MODEL = "numind/NuExtract-1.5-tiny"
-DATASET_PATH = PROJECT_ROOT / "tests" / "integration" / "ingredients.csv"
+DATASET_PATH = Path(__file__).parent / "ingredients.csv"
 TMP_DIR = PROJECT_ROOT / ".tmp"
 OUTPUT_DIR = TMP_DIR / "finetune-output"
 LLAMA_CPP_DIR = TMP_DIR / "llama.cpp"

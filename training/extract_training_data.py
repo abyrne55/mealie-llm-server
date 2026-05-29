@@ -6,7 +6,7 @@ recipe pages for raw ingredient text, filters to foods present in the
 default en-US seed database, and appends new entries to the training JSONL.
 
 Usage:
-    uv run python scripts/extract_training_data.py
+    uv run python training/extract_training_data.py
 
 Requires MEALIE_URL and MEALIE_API_KEY environment variables (or .env.test).
 """
@@ -27,12 +27,12 @@ from pathlib import Path
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(PROJECT_ROOT))
 
-from scripts.training_data import load_training_data  # noqa: E402
+from training.training_data import load_training_data  # noqa: E402
 
 SEED_FOODS_PATH = (
     PROJECT_ROOT / ".." / "mealie" / "mealie" / "repos" / "seed" / "resources" / "foods" / "locales" / "en-US.json"
 )
-DATASET_PATH = PROJECT_ROOT / "tests" / "integration" / "ingredients.csv"
+DATASET_PATH = Path(__file__).parent / "ingredients.csv"
 ENV_FILE = PROJECT_ROOT / ".env.test"
 
 

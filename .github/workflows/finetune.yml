@@ -4,8 +4,8 @@ on:
   push:
     branches: [main]
     paths:
-      - scripts/finetune.py
-      - tests/integration/ingredients.csv
+      - training/finetune.py
+      - training/ingredients.csv
   workflow_dispatch:
 
 jobs:
@@ -37,7 +37,7 @@ jobs:
         env:
           PYTORCH_MPS_HIGH_WATERMARK_RATIO: "0.0"
           PYTORCH_ENABLE_MPS_FALLBACK: "1"
-        run: uv run python scripts/finetune.py
+        run: uv run python training/finetune.py
 
       - name: Upload GGUF artifact
         uses: actions/upload-artifact@v7
