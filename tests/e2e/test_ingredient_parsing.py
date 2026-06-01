@@ -173,10 +173,14 @@ def test_ingredient_parsing(
         if result["food"] not in accepted_foods:
             mismatches.append({"field": "food", "expected": exp_food, "actual": result["food"]})
 
+    note_score = None
     if exp_note and not actual_note:
+        note_score = 0.0
         mismatches.append({"field": "note", "expected": exp_note, "actual": actual_note})
-    elif exp_note and actual_note and _ngram_jaccard(actual_note, exp_note) < 0.3:
-        mismatches.append({"field": "note", "expected": exp_note, "actual": actual_note})
+    elif exp_note and actual_note:
+        note_score = _ngram_jaccard(actual_note, exp_note)
+        if note_score < 0.3:
+            mismatches.append({"field": "note", "expected": exp_note, "actual": actual_note})
 
     record = {
         "input": ingredient,
@@ -190,6 +194,7 @@ def test_ingredient_parsing(
         "status": "pass" if not mismatches else "fail",
         "mismatches": mismatches,
         "trace": trace,
+        "note_score": note_score,
     }
     results_collector.append(record)
     request.node._e2e_result = record

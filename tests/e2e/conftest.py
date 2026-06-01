@@ -136,30 +136,55 @@ def pytest_runtest_makereport(item, call):
 
 
 def pytest_html_results_table_header(cells):
+    # default: Result(0) Test(1) Duration(2) Links(3)
+    del cells[3]  # Links
+    del cells[1]  # Test ID
+    # now: Result(0) Duration(1)
     cells.insert(1, "<th>Input</th>")
-    cells.insert(2, "<th>Trace</th>")
+    cells.insert(2, "<th>Expected</th>")
+    cells.insert(3, "<th>Actual</th>")
+    cells.insert(4, "<th>Trace</th>")
+    # final: Result | Input | Expected | Actual | Trace | Duration
+
+
+def _format_fields(data: dict) -> str:
+    parts = []
+    for field in ("quantity", "unit", "food", "note"):
+        val = data.get(field)
+        if val is not None and val != "":
+            parts.append(f"<b>{field}:</b> {html_mod.escape(str(val))}")
+    return "<br>".join(parts)
 
 
 def pytest_html_results_table_row(report, cells):
     result = getattr(report, "_e2e_result", None)
+    del cells[-1]  # Links
+    del cells[1]  # Test ID
     if result is None:
         cells.insert(1, "<td>-</td>")
         cells.insert(2, "<td>-</td>")
+        cells.insert(3, "<td>-</td>")
+        cells.insert(4, "<td>-</td>")
         return
 
     input_text = html_mod.escape(result["input"])
     cells.insert(1, f"<td>{input_text}</td>")
+    cells.insert(2, f"<td>{_format_fields(result['expected'])}</td>")
+    cells.insert(3, f"<td>{_format_fields(result['actual'])}</td>")
 
     trace = result.get("trace", {})
     mismatches = result.get("mismatches", [])
+    note_score = result.get("note_score")
     trace_parts = []
     for stage, value in trace.items():
         display = json.dumps(value, default=str) if isinstance(value, dict) else str(value)
         trace_parts.append(f"<b>{stage}:</b> {html_mod.escape(display)}")
+    if note_score is not None:
+        trace_parts.append(f"<b>note_similarity:</b> {note_score:.2f}")
     if mismatches:
         mismatch_strs = [f"{m['field']}: {m['expected']!r} → {m['actual']!r}" for m in mismatches]
         trace_parts.append(f"<b>mismatches:</b> {html_mod.escape('; '.join(mismatch_strs))}")
-    cells.insert(2, f"<td>{'<br>'.join(trace_parts)}</td>")
+    cells.insert(4, f"<td>{'<br>'.join(trace_parts)}</td>")
 
 
 def pytest_terminal_summary(terminalreporter, exitstatus, config):
