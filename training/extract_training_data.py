@@ -27,6 +27,7 @@ from pathlib import Path
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(PROJECT_ROOT))
 
+from mealie_local_ai.regex_parser import normalize_numeric_text  # noqa: E402
 from training.training_data import load_training_data  # noqa: E402
 
 SEED_FOODS_PATH = (
@@ -226,6 +227,7 @@ def main() -> None:
                 print(f"  warning (not seeded): {food_name}", file=sys.stderr)
 
             ingredient_text = matches.get(i) or (ing.get("originalText") or "").strip()
+            ingredient_text = normalize_numeric_text(ingredient_text)
             if not ingredient_text:
                 stats["skipped_no_text"] += 1
                 continue

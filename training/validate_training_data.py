@@ -14,6 +14,7 @@ from __future__ import annotations
 
 import csv
 import sys
+import unicodedata
 from pathlib import Path
 
 _EXPECTED_HEADER = ["ingredient_text", "quantity", "unit", "food", "note"]
@@ -63,6 +64,14 @@ def validate_file(filepath: str) -> list[str]:
 
         if not food:
             errors.append(f"  line {row_num}: food must not be empty")
+
+        for field_name, field_val in [("ingredient_text", ingredient_text), ("note", note)]:
+            for ch in field_val:
+                if unicodedata.category(ch) == "No":
+                    errors.append(
+                        f"  line {row_num}: {field_name} contains unicode fraction '{ch}' — normalize to decimal"
+                    )
+                    break
 
         key = ingredient_text.strip().lower()
         if key in seen:

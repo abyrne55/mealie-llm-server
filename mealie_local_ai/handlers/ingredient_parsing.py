@@ -12,7 +12,7 @@ from llama_cpp import LlamaGrammar
 
 from mealie_local_ai.handlers.base import Handler
 from mealie_local_ai.models import ChatCompletionRequest, ChatCompletionResponse, build_chat_completion_response
-from mealie_local_ai.regex_parser import RegexParser
+from mealie_local_ai.regex_parser import RegexParser, decimal_to_fraction, normalize_numeric_text
 
 if TYPE_CHECKING:
     from llama_cpp import Llama
@@ -153,8 +153,14 @@ class IngredientParsingHandler(Handler):
 
         results = []
         for ingredient_text in ingredients:
+            ingredient_text = normalize_numeric_text(ingredient_text)
+
             regex_result = self._regex_parser.try_parse(ingredient_text)
             if regex_result is not None:
+                if regex_result["note"]:
+                    regex_result["note"] = re.sub(
+                        r"\d+\.\d+", lambda m: decimal_to_fraction(float(m.group())), regex_result["note"]
+                    )
                 logger.info("Regex match: %r -> %s", ingredient_text, regex_result)
                 results.append(regex_result)
                 continue
@@ -200,6 +206,9 @@ class IngredientParsingHandler(Handler):
             except Exception:
                 logger.warning("Failed to parse ingredient %r; returning blank", ingredient_text, exc_info=True)
                 raw = {"quantity": None, "unit": None, "food": "", "note": ingredient_text}
+
+            if raw.get("note"):
+                raw["note"] = re.sub(r"\d+\.\d+", lambda m: decimal_to_fraction(float(m.group())), raw["note"])
 
             results.append(raw)
 
