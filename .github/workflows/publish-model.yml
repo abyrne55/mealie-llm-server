@@ -72,6 +72,6 @@ jobs:
         env:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
         run: |
-          uv run huggingface-cli upload "$HF_REPO" \
+          uv run hf upload "$HF_REPO" \
             "$GGUF_FILE" "$GGUF_FILE" \
             --commit-message "Update fine-tuned GGUF from workflow run ${{ steps.resolve.outputs.run_id }}"
