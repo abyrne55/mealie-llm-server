@@ -19,14 +19,7 @@ _XFAIL_REGISTRY: dict[str, str] = {
     "1 cup chickpea cooking liquid": "LLM extracts food as 'chickpea' instead of 'chickpea cooking liquid'",
     "1 bunch green onions, sliced": "resolver doesn't map 'green onions' to 'scallion'",
     "1 can corn": "resolver maps 'corn' to 'corn oil' instead of 'sweet corn'",
-    "1 cup long-grain white rice (basmati or jasmine)": "resolver maps to 'brown long grain rice' instead of 'basmati rice'",
-    "¼ cup dry white wine": "LLM drops 'dry' qualifier from note",
-    "½ to ⅔ cup sugar": "LLM captures range remainder but drops context ('up to ⅔ cup')",
-    "1.5 to 2 pounds zucchini (about 3 to 4 medium)": "LLM uses first value (1.5) not midpoint (1.75) for range qty",
-    "2 heaped cups cherry tomatoes, about 0.75 pound": "LLM note format 'about ¾ pound' doesn't match expected '(¾ lb)'",
     "1 large garlic clove": "LLM puts 'clove' in note instead of unit field",
-    "1 pound thin spaghetti": "LLM drops 'thin' qualifier from note",
-    "1 packed cup fresh basil leaves, plus more for garnish if desired": "LLM truncates note to 'fresh', drops garnish info",
     "Coarsely chopped cilantro leaves and tender stems, for serving": "LLM hallucates qty=1 and truncates note",
 }
 
@@ -49,7 +42,7 @@ CURATED_CASES = [
     ("1 bunch green onions, sliced", 1.0, "bunch", "scallion", "sliced"),
     ("1 can corn", 1.0, "can", "sweet corn", ""),
     ("2 tablespoons rice vinegar", 2.0, "tablespoon", "rice wine vinegar", ""),
-    ("1 cup long-grain white rice (basmati or jasmine)", 1.0, "cup", "basmati rice", "(basmati or jasmine)"),
+    ("1 cup long-grain white rice (basmati or jasmine)", 1.0, "cup", "long-grain white rice", "basmati or jasmine"),
     # Novel-style structural checks
     ("3 pounds fresh broccoli", 3.0, "pound", None, ""),
     ("1 kilogram pineapple, fresh", 1.0, "kilogram", None, "fresh"),
@@ -60,11 +53,11 @@ CURATED_CASES = [
     ("¼ cup dry white wine", 0.25, "cup", "white wine", "dry"),
     ("½ lemon, squeezed as needed (optional)", 0.5, None, "lemon", "optional, squeezed as needed"),
     ("1½ lemons, squeezed as needed (optional)", 1.5, None, "lemons", "optional, squeezed as needed"),
-    ("½ to ⅔ cup sugar", 0.5, "cup", "sugar", "up to ⅔ cup"),
+    ("½ to ⅔ cup sugar", 0.5, "cup", "sugar", "(up to ⅔ cup)"),
     # CSV training failures — decimal inputs
     ("0.333 cup unsweetened smooth, natural peanut butter", 0.333, "cup", "peanut butter", "smooth, unsweetened"),
-    ("1.5 to 2 pounds zucchini (about 3 to 4 medium)", 1.75, "pound", "zucchini", "(3-4 medium zucchini)"),
-    ("2 heaped cups cherry tomatoes, about 0.75 pound", 2.0, "cup", "cherry tomatoes", "(¾ lb)"),
+    ("1.5 to 2 pounds zucchini (about 3 to 4 medium)", 1.5, "pound", "zucchini", "(up to 2 lb) 3-4 medium zucchini"),
+    ("2 heaped cups cherry tomatoes, about 0.75 pound", 2.0, "cup", "cherry tomatoes", "(¾ lb) heaped"),
     (
         "1 (15-ounce) can chickpeas or 1.5 cups cooked chickpeas, rinsed and patted dry",
         1.0,

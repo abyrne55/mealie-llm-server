@@ -1,26 +1,17 @@
 ingredient_text,quantity,unit,food,note
-1 cup flour,1,cup,flour,
-2 tablespoons olive oil,2,tablespoons,olive oil,
 3 eggs,3,,eggs,
-1.5 cups chicken broth,1.5,cups,chicken broth,
-4 tbsp butter,4,tbsp,butter,
-2 tsp vanilla extract,2,tsp,vanilla extract,
-1 lb chicken breast,1,lb,chicken breast,
-8 oz cream cheese,8,oz,cream cheese,
 "2 cloves garlic, minced",2,cloves,garlic,minced
 1 can diced tomatoes,1,can,tomatoes,diced
 "1 small onion, diced",1,,onion,diced
 "3 medium potatoes, peeled and cubed",3,,potatoes,peeled and cubed
 1 cup canned whole berry cranberry sauce,1,cup,cranberry sauce,"canned, whole berry"
 "0.5 cup salted butter, softened",0.5,cup,butter,"salted, softened"
-2 cups chicken stock,2,cups,chicken stock,
-1lb ground chicken,1,lb,ground chicken,
 "1 bunch green onions, sliced",1,bunch,green onions,sliced
 1 can corn,1,can,corn,
 "1 yellow onion, diced into 0.5-inch pieces",1,,yellow onion,diced into 0.5-inch pieces
 "1 (14- to16-ounce) package extra-firm tofu, drained and crumbled into 1-inch chunks",1,pack,extra firm tofu,(14-16 oz) drained and crumbled into 1 inch chunks
-5 to 6 cups cooked leftover white or brown rice (any variety); see Tip,5.5,cups,rice,"cooked/leftover, any variety"
-"2 to 3 tablespoons store-bought or homemade chile crisp, plus more to serve",2.5,tablespoons,chili crisp,plus more to serve
+5 to 6 cups cooked leftover white or brown rice (any variety); see Tip,5,cups,rice,"(up to 6 cups) cooked/leftover, any variety"
+"2 to 3 tablespoons store-bought or homemade chile crisp, plus more to serve",2,tablespoons,chili crisp,(up to 3 tbsp) plus more to serve
 2 tablespoons soy sauce or tamari,2,tablespoons,soy sauce,or tamari
 2 cups/8 ounces frozen shelled edamame,2,cups,edamame,"(8 oz) shelled, frozen"
 "2 scallions, thinly sliced",2,,scallions,thinly sliced
@@ -30,21 +21,17 @@ ingredient_text,quantity,unit,food,note
 1 large garlic clove,1,clove,garlic,
 "1 packed cup fresh basil leaves, plus more for garnish if desired",1,cup,basil,"fresh, plus more for garnish"
 "1 cup/1.5 ounces finely grated Parmigiano-Reggiano cheese, plus more for garnish if desired",1,cup,parmigiano reggiano cheese,"(1.5 oz) finely grated, plus more for garnish"
-3 tablespoons extra-virgin olive oil,3,tablespoons,olive oil,
 "1 medium yellow or red onion, diced",1,,yellow onion,"or red onion, diced"
-1 tablespoon tomato paste,1,tablespoon,tomato paste,
 "3 garlic cloves, grated or finely minced",3,cloves,garlic,grated or finely minced
 "1.5 teaspoons garam masala, plus more to taste",1.5,teaspoons,garam masala,plus more to taste
 0.25 teaspoon ground cinnamon,0.25,teaspoon,cinnamon,
 0.25 teaspoon ground cayenne,0.25,teaspoon,cayenne,
-1 pound ground turkey,1,pound,ground turkey,
-1 cup long-grain white rice (basmati or jasmine),1,cup,basmati rice,or jasmine
+1 cup long-grain white rice (basmati or jasmine),1,cup,long-grain white rice,basmati or jasmine
 1 cup frozen peas or corn,1,cup,frozen peas,or frozen corn
 "1 cup freshly chopped cilantro or parsley, more for serving (optional)",1,cup,cilantro,"optional, or parsley, plus more for serving"
-0.25 cup soy sauce,0.25,cup,soy sauce,
 2 tablespoons rice vinegar,2,tablespoons,rice vinegar,
 2 tablespoons dark brown sugar,2,tablespoons,brown sugar,dark preferred
-"1 to 2 tablespoons chile sauce, such as sambal oelek or Sriracha",1.5,tablespoons,chile sauce,such as sambal oelek or Sriracha
+"1 to 2 tablespoons chile sauce, such as sambal oelek or Sriracha",1,tablespoons,chile sauce,(up to 2 tbsp) such as sambal oelek or Sriracha
 "3 tablespoons neutral oil (such as grapeseed or sunflower), plus more as needed",3,tablespoons,neutral oil,"such as grapeseed or sunflower, plus more as needed"
 "2 (8-ounce) packages tempeh, crumbled into pieces no larger than 0.5 inch",2,packs,tempeh,(16 oz) crumbled into 0.5 inch pieces
 0.333 cup nutritional yeast,0.333,cup,nutritional yeast,
@@ -64,7 +51,7 @@ ingredient_text,quantity,unit,food,note
 2 teaspoons gochugaru (Korean red-pepper flakes) or 1 teaspoon crushed red pepper,2,teaspoons,gochugaru,or 1 tsp crushed red pepper
 8 ounces bucatini or spaghetti,8,ounces,bucatini,or spaghetti
 "Coarsely chopped cilantro leaves and tender stems, for serving",,,cilantro,"leaves & stems coarsely chopped, for serving"
-1.5 to 2 pounds zucchini (about 3 to 4 medium),1.75,pounds,zucchini,(3-4 medium zucchini)
+1.5 to 2 pounds zucchini (about 3 to 4 medium),1.5,pounds,zucchini,(up to 2 lb) 3-4 medium zucchini
 "1 jalapeño, halved lengthwise, stemmed and sliced into 0.125-inch-thick half-moons",1,,jalapeño,"halved lengthwise, stemmed and sliced into 0.125-inch-thick half-moons"
 "2 limes, 1 zested and juiced, the other cut into wedges for serving",2,,limes,"1 zested and juiced, the other cut into wedges for serving"
 "0.75 cup corn oil, plus more as needed",0.75,cup,corn oil,plus more as needed
@@ -75,22 +62,17 @@ ingredient_text,quantity,unit,food,note
 "2 tablespoons unsalted butter, melted",2,tablespoons,butter,"unsalted, melted"
 1 tablespoon white sesame seeds,1,tablespoon,sesame seeds,white
 1 pound lean ground beef (10-percent fat),1,pound,ground beef,10% fat preferred
-2 teaspoons vegetable oil,2,teaspoons,vegetable oil,
 "4 slices American cheese, cut into quarters",4,slices,american cheese,cut into quarters
 2.25 cups chicken broth or vegetable broth,2.25,cups,chicken broth,or vegetable broth
 2 packed cups (6 ounces) shredded cabbage (thinly sliced with a knife or store-bought preshredded),2,cups,cabbage,thinly sliced with a knife or store-bought preshredded
 egg,1,,egg,
 0.5 cup grated Parmesan,0.5,cup,parmesan cheese,grated
-0.5 cup pastina pasta,0.5,cup,pastina,
-1 tablespoon butter,1,tablespoon,butter,
 "1 instant ramen noodle brick (not from cup ramen), soup packet discarded",1,pack,ramen noodle,"brick (not from cup ramen), soup packet discarded"
-"2 ounces cream cheese, cubed",2,ounces,cream cheese,cubed
 "3 tablespoons shaker Parmesan or freshly grated, plus more if desired",3,tablespoons,parmesan cheese,"shaker or freshly grated, plus more if desired"
-1 teaspoon olive oil,1,teaspoon,olive oil,
 "0.5 cup/120 milliliters canola or grapeseed oil, plus more for the pan",0.5,cup,canola oil,"(120 ml) or grapeseed oil, plus more for the pan"
 1.333 cups/170 grams all-purpose flour,170,grams,flour,(1.333 cups)
 1.5 cups/300 grams granulated sugar,300,grams,sugar,(1.5 cups)
-0.75 cup/75 grams Dutch-process cocoa powder,75,grams,cocoa,(0.75 cup) Dutch-process preferred
+0.75 cup/75 grams Dutch-process cocoa powder,75,grams,cocoa powder,(0.75 cup) Dutch-process preferred
 1 teaspoon baking powder,1,teaspoon,baking powder,
 1 teaspoon baking soda,1,teaspoon,baking soda,
 0.667 cup/150 grams sour cream,150,grams,sour cream,(0.667 cup)
@@ -100,67 +82,56 @@ egg,1,,egg,
 "1.25 cups/280 grams unsalted butter, softened to room temperature, divided",280,grams,butter,"(1.25 cups) unsalted, softened to room temperature, divided"
 "7 ounces/200 grams thawed frozen kataifi, clumps separated if needed, roughly chopped (about 3 lightly packed cups), see Tip",200,grams,kataifi,"(7 oz / 3 lightly-packed cups) thawed, clumps separated if needed, roughly chopped"
 1.25 cups/170 grams shelled raw pistachios,170,grams,pistachios,"(1.25 cups) shelled, raw"
-2 tablespoons canola or grapeseed oil,2,tablespoons,canola oil,or grapeseed oil
 2 cups/240 grams powdered sugar,240,grams,powdered sugar,(2 cups)
-1 teaspoon vanilla extract,1,teaspoon,vanilla extract,
 1.5 cups/360 milliliters heavy cream,1.5,cups,heavy cream,(360 ml)
-8 ounces/225 grams bittersweet chocolate chips,225,grams,chocolate,(8 oz) bittersweet preferred
-2 tablespoons extra-virgin olive oil,2,tablespoons,olive oil,
+8 ounces/225 grams bittersweet chocolate chips,225,grams,chocolate chips,(8 oz) bittersweet preferred
 "2 garlic cloves, minced or puréed",2,cloves,garlic,minced or puréed
 1 teaspoon chopped fresh rosemary,1,teaspoon,rosemary,"chopped, fresh"
 2 boneless skinless chicken breasts,2,,chicken breasts,"boneless, skinless"
 0.25 cup dry white wine,0.25,cup,white wine,dry
-"2 heaped cups cherry tomatoes, about 0.75 pound",2,cups,cherry tomatoes,(0.75 lb)
+"2 heaped cups cherry tomatoes, about 0.75 pound",2,cups,cherry tomatoes,(0.75 lb) heaped
 Pinch of sugar,1,pinch,sugar,
 2 tablespoons all-purpose flour or a gluten- free flour such as rice flour or corn flour,2,tablespoons,flour,"or gluten-free flour (e.g., rice flour, corn flour)"
-"2 tablespoons grapeseed, sunflower or canola oil",2,tablespoons,canola oil,or grapeseed oil or sunflower oil
 1 tablespoon chopped flat-leaf parsley,1,tablespoon,parsley,"chopped, flat-leaf"
 0.25 cup grated Parmesan (optional),0.25,cup,parmesan cheese,"optional, grated"
 "2.5 pounds bone-in, skin-on chicken thighs",2.5,pounds,chicken thighs,"bone-in, skin-on"
 "2 medium leeks, trimmed, halved lengthwise, thinly sliced crosswise then rinsed",2,,leeks,"trimmed, halved lengthwise, thinly sliced crosswise then rinsed"
-"6 garlic cloves, thinly sliced",6,cloves,garlic,thinly sliced
-1 lemon,1,,lemon,
 1 cup low-sodium chicken broth or water,1,cup,chicken broth,"low-sodium preferred, or water"
 1 cup fresh or frozen peas,1,cup,peas,fresh or frozen
 "1 cup fresh dill or mint leaves, torn if large",1,cup,dill,"or mint, fresh leaves, torn if large"
 2 cups minus 2 tablespoons cake flour (8.5 ounces),8.5,ounces,cake flour,(2 cups minus 2 tbsp)
 1.667 cups bread flour (8.5 ounces),8.5,ounces,bread flour,(1.667 cups)
-1.25 teaspoons baking soda,1.25,teaspoons,baking soda,
-1.5 teaspoons baking powder,1.5,teaspoons,baking powder,
 1.25 cups unsalted butter (2.5 sticks),1.25,cups,butter,(2.5 sticks) unsalted
 1.25 cups light brown sugar (10 ounces),10,ounces,brown sugar,(1.25 cups) light preferred
 1 cup plus 2 tablespoons granulated sugar (8 ounces),8,ounces,sugar,(1 cup plus 2 tbsp)
 2 teaspoons natural vanilla extract,2,teaspoons,vanilla extract,
 "1.25 pounds bittersweet chocolate disks or fèves, at least 60 percent cacao content (see note)",1.25,pounds,chocolate,"disks or fèves, bittersweet, ≥60% cacao"
-2.5 cups chicken broth,2.5,cups,chicken broth,
-"0.25 cup salted butter, softened",0.25,cup,butter,"salted, softened"
-"2.5 tsp garam masala, plus more to taste",2.5,tsp,garam masala,plus more to taste
-0.5 tsp ground cinnamon,0.5,tsp,cinnamon,
-0.667 cup nutritional yeast,0.666,cup,nutritional yeast,
-"0.333 cup extra-virgin olive oil, plus more for drizzling",0.333,cup,olive oil,plus more for drizzling
-"1.5 lemons, squeezed as needed (optional)",1.5,,lemons,"optional, squeezed as needed"
-0.333 cup roasted peanuts (salted or unsalted),0.333,cup,peanuts,"roasted, salted or unsalted"
-0.333 cup dry white wine,0.333,cup,white wine,dry
-1.75 tsp baking soda,1.75,tsp,baking soda,
-2.25 tsp baking powder,2.25,tsp,baking powder,
-"1.75 lbs semisweet chocolate chips, at least 50% cacao content",1.75,lbs,chocolate,"chips, semisweet, ≥50% cacao"
-0.375 cup brown sugar,0.375,cup,brown sugar,
-0.375 tsp cayenne,0.375,tsp,cayenne,
-3.375 cups chicken broth,3.375,cups,chicken broth,
-0.625 cup flour,0.625,cup,flour,
-2.625 tbsp olive oil,2.625,tbsp,olive oil,
-0.875 cup heavy cream,0.875,cup,heavy cream,
-1.875 cups chicken stock,1.875,cups,chicken stock,
-0.4 cup sour cream,0.4,cup,sour cream,
-0.6 lb ground beef,0.6,lb,ground beef,
-1.5 cups rice,1.5,cups,rice,
-2.25 tsp vanilla extract,2.25,tsp,vanilla extract,
-3.333 tbsp extra-virgin olive oil,3.333,tbsp,olive oil,
-1.75 cups soy sauce,1.75,cups,soy sauce,
-2.375 tsp baking powder,2.375,tsp,baking powder,
-1.625 oz cream cheese,1.625,oz,cream cheese,
-0.5 tablespoon onion powder,0.5,tablespoon,onion powder,
 "2 boneless, skinless chicken breasts, about 1.5 to 2 pounds (see Tip)",2,,chicken breasts,"(1.5-2 lb) boneless, skinless"
 "1.25 pounds rhubarb, trimmed and cut into 1-inch pieces (about 4 cups)",1.25,pounds,rhubarb,trimmed and cut into 1-inch pieces
-0.5 to 0.667 cup sugar,0.5,cup,sugar,up to 0.667 cup
+0.5 to 0.667 cup sugar,0.5,cup,sugar,(up to 0.667 cup)
 "1 vanilla bean, halved lengthwise; 1 teaspoon cardamom pods; or 1 (1-inch) piece fresh ginger, sliced into coins, for flavoring (optional)",1,,vanilla bean,"halved lengthwise, or 1 tsp cardamom pods, or 1 inch of sliced ginger (optional)"
+1 cup dry red wine,1,cup,red wine,dry
+2 tablespoons smooth Dijon mustard,2,tablespoons,Dijon mustard,smooth
+1 pound thick-cut bacon,1,pound,bacon,thick-cut
+8 ounces wide egg noodles,8,ounces,egg noodles,wide
+1 cup soft goat cheese,1,cup,goat cheese,soft
+2 tablespoons coarse sea salt,2,tablespoons,sea salt,coarse
+Kosher salt,,,kosher salt,
+Freshly ground black pepper,,,black pepper,freshly ground
+Cooking spray,,,cooking spray,
+"Fresh parsley, for garnish",,,parsley,"fresh, for garnish"
+"Flaky sea salt, for finishing",,,sea salt,"flaky, for finishing"
+3 to 4 cups vegetable broth,3,cups,vegetable broth,(up to 4 cups)
+1 to 1.5 teaspoons ground cumin,1,teaspoons,cumin,(up to 1.5 tsp)
+0.5 to 1 teaspoon red pepper flakes,0.5,teaspoon,red pepper flakes,(up to 1 tsp)
+"2 to 3 cloves garlic, minced",2,cloves,garlic,(up to 3 cloves) minced
+"1 large garlic clove, peeled",1,clove,garlic,peeled
+3 small shallot cloves,3,cloves,shallot,
+1 whole head garlic,1,head,garlic,whole
+2 thick slices sourdough bread,2,slices,sourdough bread,thick
+"2 tablespoons chopped chives, plus more for garnish",2,tablespoons,chives,"chopped, plus more for garnish"
+"1 cup shredded mozzarella, plus more for topping",1,cup,mozzarella,"shredded, plus more for topping"
+"0.25 cup fresh mint leaves, plus more for serving",0.25,cup,mint,"fresh, plus more for serving"
+1 (28-ounce) can crushed tomatoes,1,can,tomatoes,(28 oz) crushed
+1 (14-ounce) can coconut milk,1,can,coconut milk,(14 oz)
+"2 (14.5-ounce) cans diced tomatoes, undrained",2,cans,tomatoes,"(29 oz) diced, undrained"

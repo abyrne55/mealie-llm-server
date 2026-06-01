@@ -107,7 +107,7 @@ The script fetches all recipes from Mealie, scrapes the original recipe pages fo
 2. **Header row**: `ingredient_text,quantity,unit,food,note` — must be present.
 3. **Quantity values**: Integer (`1`), float (`1.5`), or empty for absent. Stored as `str()` representation.
 4. **Empty values**: Use empty string for absent unit/note.
-5. **Food values should match Mealie DB entries when possible**: Prefer foods that exist verbatim (case-insensitive) in the Mealie test instance seeded by `scripts/start-mealie.sh`. Query the API (`/api/foods?search=<term>`) to verify. If the ingredient text uses a synonym or variant not in the DB, map `food` to the correct DB entry and capture the original qualifier in `note` (e.g., "arborio rice" → `food: "risotto rice"`, `note: "arborio"`). Novel foods not in the DB are acceptable — use the raw ingredient text as the food value.
+5. **Food values should match the raw ingredient text**: Use the food name as it appears in the input text (e.g., "long-grain white rice", "cocoa powder", "chocolate chips"). The food resolver handles mapping to Mealie DB entries at inference time. Novel foods not in the DB are acceptable.
 6. **Unit values must be known aliases**: Every non-empty `unit` value must appear in the Mealie unit alias map (canonical name, plural, or abbreviation). Check via `/api/units?per_page=-1`.
 
 ## Supported Extraction Models
@@ -116,6 +116,6 @@ Set `MODEL_INGREDIENT_EXTRACTOR` to switch.
 
 | Model | ID | Speed | Notes |
 |---|---|---|---|
-| **NuExtract-tiny-v1.5 fine-tuned** (default) | `abyrne55/nuextract-1.5-tiny-mealie-ingredient-parser:q8_0` | ~1.8s/ingredient | ~0.5GB, LoRA fine-tuned on 167-example ingredient dataset (shuffled), 93% training / 97% novel ingredient pass rate |
+| **NuExtract-tiny-v1.5 fine-tuned** (default) | `abyrne55/nuextract-1.5-tiny-mealie-ingredient-parser:q8_0` | ~1.8s/ingredient | ~0.5GB, LoRA fine-tuned on 136-example ingredient dataset (shuffled), pass rates pending re-evaluation after dataset reshape |
 | NuExtract-tiny-v1.5 (base) | `DevQuasar-3/numind.NuExtract-tiny-v1.5-GGUF:Q6_K` | ~1.8s/ingredient | ~0.5GB, base model without fine-tuning, 49% test pass rate |
 | NuExtract-v1.5 | `DevQuasar-3/numind.NuExtract-v1.5-GGUF:Q6_K` | ~3s/ingredient | ~1.5GB, larger base model |
