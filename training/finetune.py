@@ -44,14 +44,14 @@ GGUF_NAME = "nuextract-1.5-tiny-finetuned-q8_0.gguf"
 
 def parse_args() -> argparse.Namespace:
     p = argparse.ArgumentParser(description="Fine-tune NuExtract-tiny-v1.5 with LoRA")
-    p.add_argument("--epochs", type=int, default=3)
+    p.add_argument("--epochs", type=int, default=10)
     p.add_argument("--lr", type=float, default=2e-4)
     p.add_argument("--lora-rank", type=int, default=16)
     p.add_argument("--lora-alpha", type=int, default=32)
     p.add_argument("--batch-size", type=int, default=2)
     p.add_argument("--grad-accum", type=int, default=4)
     p.add_argument("--max-seq-length", type=int, default=512)
-    p.add_argument("--warmup-steps", type=int, default=6)
+    p.add_argument("--warmup-steps", type=int, default=10)
     p.add_argument("--weight-decay", type=float, default=0.01)
     p.add_argument("--skip-convert", action="store_true", help="Skip GGUF conversion")
     p.add_argument("--output-dir", type=Path, default=OUTPUT_DIR)
