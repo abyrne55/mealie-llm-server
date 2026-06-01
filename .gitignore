@@ -224,6 +224,7 @@ __marimo__/
 # Local
 .tmp/
 models/
+results/
 docs/superpowers/
 .claude
 .agents

@@ -1,15 +1,19 @@
 from __future__ import annotations
 
 import asyncio
+import json
 import os
 from pathlib import Path
 
 import httpx
 import pytest
+from llama_cpp import LlamaGrammar
 
 from mealie_local_ai.config import Settings
 from mealie_local_ai.food_resolver import FoodResolver
+from mealie_local_ai.handlers.ingredient_parsing import _STRUCTURE_SCHEMA
 from mealie_local_ai.mealie_client import MealieClient
+from mealie_local_ai.regex_parser import RegexParser
 
 
 def _load_env_file() -> None:
@@ -95,3 +99,45 @@ def foods(mealie_client):
 @pytest.fixture(scope="session")
 def unit_aliases(mealie_client):
     return asyncio.run(mealie_client.get_unit_aliases())
+
+
+@pytest.fixture(scope="session")
+def regex_parser(foods, unit_aliases):
+    parser = RegexParser()
+    all_units = [a for aliases in unit_aliases.values() for a in aliases]
+    parser.build(foods, all_units)
+    return parser
+
+
+@pytest.fixture(scope="session")
+def grammar():
+    return LlamaGrammar.from_json_schema(json.dumps(_STRUCTURE_SCHEMA))
+
+
+_collected_results: list[dict] = []
+
+
+@pytest.fixture(scope="session")
+def results_collector():
+    yield _collected_results
+    results_dir = Path(__file__).resolve().parents[2] / "results"
+    results_dir.mkdir(exist_ok=True)
+    report_path = results_dir / "e2e-report.json"
+    with open(report_path, "w") as f:
+        json.dump(_collected_results, f, indent=2, default=str)
+
+
+def pytest_terminal_summary(terminalreporter, exitstatus, config):
+    if not _collected_results:
+        return
+    terminalreporter.section("E2E Ingredient Parsing Results")
+    passed = sum(1 for r in _collected_results if r["status"] == "pass")
+    total = len(_collected_results)
+    for r in _collected_results:
+        status = "PASS" if r["status"] == "pass" else "FAIL"
+        line = f"  {status}: {r['input']}"
+        if r["mismatches"]:
+            details = ", ".join(f"{m['field']}: {m['expected']!r} != {m['actual']!r}" for m in r["mismatches"])
+            line += f" [{details}]"
+        terminalreporter.line(line)
+    terminalreporter.line(f"\n  Pass rate: {passed}/{total} ({100 * passed / total:.0f}%)")

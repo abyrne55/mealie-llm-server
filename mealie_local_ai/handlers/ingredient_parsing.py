@@ -125,6 +125,93 @@ def normalize_quantity(value: Any) -> float | None:
     return float(value)
 
 
+def parse_single_ingredient(
+    ingredient_text: str,
+    model: Llama,
+    grammar: LlamaGrammar,
+    unit_aliases: dict[str, list[str]],
+    food_resolver: FoodResolver | None = None,
+    foods: list[str] | None = None,
+    regex_parser: RegexParser | None = None,
+) -> tuple[dict, dict]:
+    """Returns (result, trace) where trace captures each pipeline stage."""
+    normalized = normalize_numeric_text(ingredient_text)
+    trace: dict = {"normalized_input": normalized}
+
+    if regex_parser is not None:
+        regex_result = regex_parser.try_parse(normalized)
+        if regex_result is not None:
+            trace["source"] = "regex"
+            trace["raw_extraction"] = dict(regex_result)
+            regex_result["unit"] = resolve_unit(regex_result.get("unit"), unit_aliases)
+            trace["resolved_unit"] = regex_result["unit"]
+            if regex_result["note"]:
+                regex_result["note"] = re.sub(
+                    r"\d+\.\d+", lambda m: decimal_to_fraction(float(m.group())), regex_result["note"]
+                )
+            logger.info("Regex match: %r -> %s", ingredient_text, regex_result)
+            return regex_result, trace
+
+    trace["source"] = "llm"
+    messages = build_messages(normalized)
+    response = model.create_chat_completion(
+        messages=messages,
+        grammar=grammar,
+        temperature=0,
+        max_tokens=-1,
+    )
+    content = response["choices"][0]["message"]["content"]
+    content = re.sub(r"[\x00-\x1f\x7f]", "", content)
+
+    try:
+        raw = json.loads(content)
+        trace["raw_extraction"] = {
+            "quantity": raw.get("quantity"),
+            "unit": raw.get("unit"),
+            "food": raw.get("food"),
+            "note": raw.get("note"),
+        }
+
+        heuristic = null_unit_heuristic(normalized, raw.get("unit"), raw.get("food"), unit_aliases)
+        trace["post_heuristic"] = dict(heuristic)
+
+        raw["unit"] = resolve_unit(heuristic["unit"], unit_aliases)
+        trace["resolved_unit"] = raw["unit"]
+        raw["food"] = heuristic["food"]
+        raw["quantity"] = normalize_quantity(raw.get("quantity"))
+
+        extracted = dict(raw)
+
+        if food_resolver and foods and raw["food"]:
+            resolved_food, score, exact = food_resolver.match(raw["food"], foods)
+            trace["resolved_food"] = {"food": resolved_food, "score": score, "exact": exact}
+            if resolved_food is not None:
+                raw["food"] = resolved_food
+            suffix = " (exact)" if exact else " (fallback)" if resolved_food is None else ""
+            logger.debug(
+                "Ingredient: %r | extracted: %s | resolved: %s | food_score: %.3f%s",
+                ingredient_text,
+                json.dumps(extracted),
+                json.dumps(raw),
+                score,
+                suffix,
+            )
+        else:
+            logger.debug(
+                "Ingredient: %r | extracted: %s | resolved: (skipped)",
+                ingredient_text,
+                json.dumps(extracted),
+            )
+    except Exception:
+        logger.warning("Failed to parse ingredient %r; returning blank", ingredient_text, exc_info=True)
+        raw = {"quantity": None, "unit": None, "food": "", "note": ingredient_text}
+
+    if raw.get("note"):
+        raw["note"] = re.sub(r"\d+\.\d+", lambda m: decimal_to_fraction(float(m.group())), raw["note"])
+
+    return raw, trace
+
+
 class IngredientParsingHandler(Handler):
     model_key = "ingredient_extractor"
 
@@ -153,64 +240,16 @@ class IngredientParsingHandler(Handler):
 
         results = []
         for ingredient_text in ingredients:
-            ingredient_text = normalize_numeric_text(ingredient_text)
-
-            regex_result = self._regex_parser.try_parse(ingredient_text)
-            if regex_result is not None:
-                if regex_result["note"]:
-                    regex_result["note"] = re.sub(
-                        r"\d+\.\d+", lambda m: decimal_to_fraction(float(m.group())), regex_result["note"]
-                    )
-                logger.info("Regex match: %r -> %s", ingredient_text, regex_result)
-                results.append(regex_result)
-                continue
-
-            messages = build_messages(ingredient_text)
-            response = model.create_chat_completion(
-                messages=messages,
-                grammar=grammar,
-                temperature=0,
-                max_tokens=-1,
+            result, _ = parse_single_ingredient(
+                ingredient_text,
+                model,
+                grammar,
+                unit_aliases,
+                food_resolver=self._food_resolver,
+                foods=foods,
+                regex_parser=self._regex_parser,
             )
-            content = response["choices"][0]["message"]["content"]
-            content = re.sub(r"[\x00-\x1f\x7f]", "", content)
-            try:
-                raw = json.loads(content)
-
-                heuristic = null_unit_heuristic(ingredient_text, raw.get("unit"), raw.get("food"), unit_aliases)
-                raw["unit"] = resolve_unit(heuristic["unit"], unit_aliases)
-                raw["food"] = heuristic["food"]
-                raw["quantity"] = normalize_quantity(raw.get("quantity"))
-
-                extracted = dict(raw)
-
-                if self._food_resolver and foods and raw["food"]:
-                    resolved_food, score, exact = self._food_resolver.match(raw["food"], foods)
-                    if resolved_food is not None:
-                        raw["food"] = resolved_food
-                    suffix = " (exact)" if exact else " (fallback)" if resolved_food is None else ""
-                    logger.debug(
-                        "Ingredient: %r | extracted: %s | resolved: %s | food_score: %.3f%s",
-                        ingredient_text,
-                        json.dumps(extracted),
-                        json.dumps(raw),
-                        score,
-                        suffix,
-                    )
-                else:
-                    logger.debug(
-                        "Ingredient: %r | extracted: %s | resolved: (skipped)",
-                        ingredient_text,
-                        json.dumps(extracted),
-                    )
-            except Exception:
-                logger.warning("Failed to parse ingredient %r; returning blank", ingredient_text, exc_info=True)
-                raw = {"quantity": None, "unit": None, "food": "", "note": ingredient_text}
-
-            if raw.get("note"):
-                raw["note"] = re.sub(r"\d+\.\d+", lambda m: decimal_to_fraction(float(m.group())), raw["note"])
-
-            results.append(raw)
+            results.append(result)
 
         output = json.dumps({"ingredients": results})
         return build_chat_completion_response(content=output, model=self._model_id or "ingredient-parser")
