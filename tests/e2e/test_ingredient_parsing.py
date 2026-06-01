@@ -142,6 +142,7 @@ def test_ingredient_parsing(
     grammar,
     regex_parser,
     results_collector,
+    request,
 ):
     result, trace = parse_single_ingredient(
         ingredient,
@@ -177,21 +178,21 @@ def test_ingredient_parsing(
     elif exp_note and actual_note and _ngram_jaccard(actual_note, exp_note) < 0.3:
         mismatches.append({"field": "note", "expected": exp_note, "actual": actual_note})
 
-    results_collector.append(
-        {
-            "input": ingredient,
-            "actual": {
-                "quantity": result.get("quantity"),
-                "unit": result.get("unit"),
-                "food": result.get("food"),
-                "note": actual_note,
-            },
-            "expected": {"quantity": exp_qty, "unit": exp_unit, "food": exp_food, "note": exp_note},
-            "status": "pass" if not mismatches else "fail",
-            "mismatches": mismatches,
-            "trace": trace,
-        }
-    )
+    record = {
+        "input": ingredient,
+        "actual": {
+            "quantity": result.get("quantity"),
+            "unit": result.get("unit"),
+            "food": result.get("food"),
+            "note": actual_note,
+        },
+        "expected": {"quantity": exp_qty, "unit": exp_unit, "food": exp_food, "note": exp_note},
+        "status": "pass" if not mismatches else "fail",
+        "mismatches": mismatches,
+        "trace": trace,
+    }
+    results_collector.append(record)
+    request.node._e2e_result = record
 
     if mismatches:
         details = "; ".join(f"{m['field']}: {m['actual']!r} != {m['expected']!r}" for m in mismatches)

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import asyncio
+import html as html_mod
 import json
 import os
 from pathlib import Path
@@ -125,6 +126,40 @@ def results_collector():
     report_path = results_dir / "e2e-report.json"
     with open(report_path, "w") as f:
         json.dump(_collected_results, f, indent=2, default=str)
+
+
+@pytest.hookimpl(hookwrapper=True)
+def pytest_runtest_makereport(item, call):
+    outcome = yield
+    report = outcome.get_result()
+    report._e2e_result = getattr(item, "_e2e_result", None)
+
+
+def pytest_html_results_table_header(cells):
+    cells.insert(1, "<th>Input</th>")
+    cells.insert(2, "<th>Trace</th>")
+
+
+def pytest_html_results_table_row(report, cells):
+    result = getattr(report, "_e2e_result", None)
+    if result is None:
+        cells.insert(1, "<td>-</td>")
+        cells.insert(2, "<td>-</td>")
+        return
+
+    input_text = html_mod.escape(result["input"])
+    cells.insert(1, f"<td>{input_text}</td>")
+
+    trace = result.get("trace", {})
+    mismatches = result.get("mismatches", [])
+    trace_parts = []
+    for stage, value in trace.items():
+        display = json.dumps(value, default=str) if isinstance(value, dict) else str(value)
+        trace_parts.append(f"<b>{stage}:</b> {html_mod.escape(display)}")
+    if mismatches:
+        mismatch_strs = [f"{m['field']}: {m['expected']!r} → {m['actual']!r}" for m in mismatches]
+        trace_parts.append(f"<b>mismatches:</b> {html_mod.escape('; '.join(mismatch_strs))}")
+    cells.insert(2, f"<td>{'<br>'.join(trace_parts)}</td>")
 
 
 def pytest_terminal_summary(terminalreporter, exitstatus, config):
