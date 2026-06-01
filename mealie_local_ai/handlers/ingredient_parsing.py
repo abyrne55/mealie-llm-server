@@ -125,6 +125,20 @@ def normalize_quantity(value: Any) -> float | None:
     return float(value)
 
 
+def extract_raw(ingredient_text: str, model: Llama, grammar: LlamaGrammar) -> dict:
+    normalized = normalize_numeric_text(ingredient_text)
+    messages = build_messages(normalized)
+    response = model.create_chat_completion(
+        messages=messages,
+        grammar=grammar,
+        temperature=0,
+        max_tokens=-1,
+    )
+    content = response["choices"][0]["message"]["content"]
+    content = re.sub(r"[\x00-\x1f\x7f]", "", content)
+    return json.loads(content)
+
+
 def parse_single_ingredient(
     ingredient_text: str,
     model: Llama,
@@ -153,18 +167,9 @@ def parse_single_ingredient(
             return regex_result, trace
 
     trace["source"] = "llm"
-    messages = build_messages(normalized)
-    response = model.create_chat_completion(
-        messages=messages,
-        grammar=grammar,
-        temperature=0,
-        max_tokens=-1,
-    )
-    content = response["choices"][0]["message"]["content"]
-    content = re.sub(r"[\x00-\x1f\x7f]", "", content)
 
     try:
-        raw = json.loads(content)
+        raw = extract_raw(ingredient_text, model, grammar)
         trace["raw_extraction"] = {
             "quantity": raw.get("quantity"),
             "unit": raw.get("unit"),

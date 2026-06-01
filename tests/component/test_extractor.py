@@ -6,28 +6,12 @@ No Mealie dependency — tests raw extraction only.
 
 from __future__ import annotations
 
-import json
-import re
-
 import pytest
 
 from mealie_local_ai.handlers.ingredient_parsing import (
-    build_messages,
+    extract_raw,
     normalize_quantity,
 )
-
-
-def _extract(ingredient_text, model, grammar):
-    messages = build_messages(ingredient_text)
-    response = model.create_chat_completion(
-        messages=messages,
-        grammar=grammar,
-        temperature=0,
-        max_tokens=-1,
-    )
-    content = response["choices"][0]["message"]["content"]
-    content = re.sub(r"[\x00-\x1f\x7f]", "", content)
-    return json.loads(content)
 
 
 SIMPLE_CASES = [
@@ -63,7 +47,7 @@ NO_UNIT_CASES = [
     ids=[c[0] for c in SIMPLE_CASES],
 )
 def test_simple_extraction(text, exp_qty, exp_unit, exp_food, llm_model, grammar):
-    raw = _extract(text, llm_model, grammar)
+    raw = extract_raw(text, llm_model, grammar)
     qty = normalize_quantity(raw.get("quantity"))
     assert qty == pytest.approx(exp_qty, abs=0.01)
     assert raw.get("food"), f"food should not be empty for '{text}'"
@@ -75,7 +59,7 @@ def test_simple_extraction(text, exp_qty, exp_unit, exp_food, llm_model, grammar
     ids=[c[0] for c in FRACTION_CASES],
 )
 def test_fraction_extraction(text, exp_qty, exp_unit, exp_food, llm_model, grammar):
-    raw = _extract(text, llm_model, grammar)
+    raw = extract_raw(text, llm_model, grammar)
     qty = normalize_quantity(raw.get("quantity"))
     assert qty == pytest.approx(exp_qty, abs=0.01)
     assert raw.get("food"), f"food should not be empty for '{text}'"
@@ -87,7 +71,7 @@ def test_fraction_extraction(text, exp_qty, exp_unit, exp_food, llm_model, gramm
     ids=[c[0] for c in MIXED_NUMBER_CASES],
 )
 def test_mixed_number_extraction(text, exp_qty, exp_unit, exp_food, llm_model, grammar):
-    raw = _extract(text, llm_model, grammar)
+    raw = extract_raw(text, llm_model, grammar)
     qty = normalize_quantity(raw.get("quantity"))
     assert qty == pytest.approx(exp_qty, abs=0.01)
     assert raw.get("food"), f"food should not be empty for '{text}'"
@@ -106,30 +90,30 @@ WITH_NOTE_CASES = [
     ids=[c[0] for c in WITH_NOTE_CASES],
 )
 def test_extraction_with_note(text, exp_food, exp_note, llm_model, grammar):
-    raw = _extract(text, llm_model, grammar)
+    raw = extract_raw(text, llm_model, grammar)
     assert raw.get("food"), f"food should not be empty for '{text}'"
     note = raw.get("note") or ""
     assert note, f"note should not be empty for '{text}'"
 
 
 def test_no_quantity_ingredient(llm_model, grammar):
-    raw = _extract("salt and pepper to taste", llm_model, grammar)
+    raw = extract_raw("salt and pepper to taste", llm_model, grammar)
     assert raw.get("food"), "food should not be empty"
 
 
 def test_multiword_food(llm_model, grammar):
-    raw = _extract("1 tablespoon tomato paste", llm_model, grammar)
+    raw = extract_raw("1 tablespoon tomato paste", llm_model, grammar)
     food = raw.get("food") or ""
     assert "tomato" in food.lower()
 
 
 def test_parenthetical(llm_model, grammar):
-    raw = _extract("1 (14-ounce) can diced tomatoes", llm_model, grammar)
+    raw = extract_raw("1 (14-ounce) can diced tomatoes", llm_model, grammar)
     assert raw.get("food"), "food should not be empty"
 
 
 def test_output_structure(llm_model, grammar):
-    raw = _extract("1 cup flour", llm_model, grammar)
+    raw = extract_raw("1 cup flour", llm_model, grammar)
     assert isinstance(raw, dict)
     assert "quantity" in raw
     assert "unit" in raw
