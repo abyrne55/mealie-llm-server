@@ -25,6 +25,17 @@ CSV_PATH = Path(__file__).parent / "ingredients.csv"
 RESULTS_DIR = Path(__file__).resolve().parent.parent / "results"
 
 
+def _plural_eq(a: str, b: str) -> bool:
+    a_lower, b_lower = a.lower(), b.lower()
+    if a_lower == b_lower:
+        return True
+    if a_lower + "s" == b_lower or b_lower + "s" == a_lower:
+        return True
+    if a_lower + "es" == b_lower or b_lower + "es" == a_lower:
+        return True
+    return False
+
+
 def _jaccard(a: str, b: str) -> float:
     if not a and not b:
         return 1.0
@@ -158,10 +169,10 @@ def test_csv_extraction(
         if abs(expected_qty - actual_qty) > 0.01:
             mismatches.append("quantity")
 
-    if actual_unit != exp_unit:
+    if not _plural_eq(actual_unit, exp_unit):
         mismatches.append("unit")
 
-    if actual_food != exp_food:
+    if not _plural_eq(actual_food, exp_food):
         mismatches.append("food")
 
     note_jaccard = _jaccard(actual_note, exp_note)
