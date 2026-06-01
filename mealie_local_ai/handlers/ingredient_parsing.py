@@ -183,7 +183,8 @@ def parse_single_ingredient(
         extracted = dict(raw)
 
         if food_resolver and foods and raw["food"]:
-            resolved_food, score, exact = food_resolver.match(raw["food"], foods)
+            query = f"{raw['food']} {raw['note']}" if raw.get("note") else raw["food"]
+            resolved_food, score, exact = food_resolver.match(query, foods)
             trace["resolved_food"] = {"food": resolved_food, "score": score, "exact": exact}
             if resolved_food is not None:
                 raw["food"] = resolved_food
