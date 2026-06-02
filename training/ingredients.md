@@ -1,4 +1,4 @@
-# Training Dataset (136 entries)
+# Training Dataset (147 entries)
 
 ## Prompt
 
@@ -157,3 +157,14 @@
 | 134 | 1 (28-ounce) can crushed tomatoes | 1 | can | tomatoes | (28 oz) crushed |
 | 135 | 1 (14-ounce) can coconut milk | 1 | can | coconut milk | (14 oz) |
 | 136 | 2 (14.5-ounce) cans diced tomatoes, undrained | 2 | cans | tomatoes | (29 oz) diced, undrained |
+| 137 | 1 pound roughly chopped organic kale, stems removed | 1 | pound | kale | roughly chopped, stems removed |
+| 138 | 3 heaped tablespoons whole-grain mustard | 3 | tablespoons | whole grain mustard | heaped |
+| 139 | 2 cups thinly sliced natural almonds, toasted | 2 | cups | almonds | thinly sliced, toasted |
+| 140 | 1 cup coarsely chopped raw walnuts, plus more for garnish | 1 | cup | walnuts | coarsely chopped, raw, plus more for garnish |
+| 141 | 1.5 pounds organic sweet potatoes, peeled and cut into 1-inch cubes (about 3 medium sweet potatoes) | 1.5 | pounds | sweet potatoes | peeled and cut into 1-inch cubes, about 3 medium sweet potatoes |
+| 142 | 1 heaped teaspoon smoked paprika | 1 | teaspoon | smoked paprika | heaped |
+| 143 | 3 cups loosely packed fresh spinach, roughly chopped | 3 | cups | spinach | fresh, roughly chopped |
+| 144 | 0.5 cup finely chopped unsalted roasted cashews | 0.5 | cup | cashews | finely chopped, unsalted, roasted |
+| 145 | 2 tablespoons finely minced organic ginger, peeled | 2 | tablespoons | ginger | finely minced, peeled |
+| 146 | 1 pound thick-cut smoked bacon, cut into 0.5-inch pieces | 1 | pound | bacon | thick-cut, cut into 0.5-inch pieces |
+| 147 | 4 large ripe organic tomatoes, coarsely chopped (about 2 pounds tomatoes) | 2 | pounds | tomatoes | (about 4 tomatoes) coarsely chopped |
