@@ -19,8 +19,6 @@ _XFAIL_REGISTRY: dict[str, str] = {
     "1 cup chickpea cooking liquid": "LLM extracts food as 'chickpea' instead of 'chickpea cooking liquid'",
     "1 bunch green onions, sliced": "resolver doesn't map 'green onions' to 'scallion'",
     "1 can corn": "resolver maps 'corn' to 'corn oil' instead of 'sweet corn'",
-    "1 large garlic clove": "LLM puts 'clove' in note instead of unit field",
-    "Coarsely chopped cilantro leaves and tender stems, for serving": "LLM hallucates qty=1 and truncates note",
 }
 
 _FOOD_ALIASES: dict[str, set[str]] = {
@@ -172,7 +170,7 @@ def test_ingredient_parsing(
         mismatches.append({"field": "note", "expected": exp_note, "actual": actual_note})
     elif exp_note and actual_note:
         note_score = _ngram_jaccard(actual_note, exp_note)
-        if note_score < 0.3:
+        if note_score < 0.5:
             mismatches.append({"field": "note", "expected": exp_note, "actual": actual_note})
 
     record = {
