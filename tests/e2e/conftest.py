@@ -61,7 +61,7 @@ def mealie_client(mealie_url, mealie_api_key):
 
 @pytest.fixture(scope="session")
 def model_id() -> str:
-    return os.environ.get("MODEL_INGREDIENT_EXTRACTOR", "DevQuasar-3/numind.NuExtract-tiny-v1.5-GGUF:Q6_K")
+    return os.environ.get("MODEL_INGREDIENT_EXTRACTOR", "abyrne55/nuextract-1.5-tiny-mealie-ingredient-parser:q8_0")
 
 
 @pytest.fixture(scope="session")

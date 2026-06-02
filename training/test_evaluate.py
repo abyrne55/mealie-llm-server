@@ -57,7 +57,7 @@ def _jaccard(a: str, b: str) -> float:
 def llm_model():
     model_id = os.environ.get(
         "MODEL_INGREDIENT_EXTRACTOR",
-        "DevQuasar-3/numind.NuExtract-tiny-v1.5-GGUF:Q6_K",
+        "abyrne55/nuextract-1.5-tiny-mealie-ingredient-parser:q8_0",
     )
     try:
         if Settings.is_local_gguf(model_id):
